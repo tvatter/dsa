@@ -1,16 +1,16 @@
-from dsa.misc.class_generator import add_property, generate_class
+# from dsa.misc.class_generator import add_property, generate_class
 
-generate_class('Node', 'src/dsa/data_structures/node.py')
-add_property('Node', 'src/dsa/data_structures/node.py', 'key')
-add_property('Node',
-             'src/dsa/data_structures/node.py',
-             'next_node',
-             setter=True)
-add_property('Node',
-             'src/dsa/data_structures/node.py',
-             'prev_node',
-             setter=True)
-add_property('Node', 'src/dsa/data_structures/node.py', 'data', setter=True)
+# generate_class('Node', 'src/dsa/data_structures/node.py')
+# add_property('Node', 'src/dsa/data_structures/node.py', 'key')
+# add_property('Node',
+#              'src/dsa/data_structures/node.py',
+#              'next_node',
+#              setter=True)
+# add_property('Node',
+#              'src/dsa/data_structures/node.py',
+#              'prev_node',
+#              setter=True)
+# add_property('Node', 'src/dsa/data_structures/node.py', 'data', setter=True)
 
 
 class Node:
