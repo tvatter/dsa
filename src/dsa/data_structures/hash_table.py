@@ -79,18 +79,18 @@ if __name__ == '__main__':
   ic(h.array)
 
   ic('... insert stuff')
-  for key in ['ss', 'qe', '234']:
-    h.insert(key)
+  for key_test in ['ss', 'qe', '234']:
+    h.insert(key_test)
   ic(h.array)
 
   ic('... insert more stuff (trigger resize)')
-  for key in ascii_letters:
-    h.insert(key)
+  for key_test in ascii_letters:
+    h.insert(key_test)
   ic(h.array)
 
   ic('... remove stuff')
-  for key in ascii_letters:
-    h.delete(key)
+  for key_test in ascii_letters:
+    h.delete(key_test)
   ic(h.array)
   ic(h.search('hi'))
   ic(h.search('ss'))

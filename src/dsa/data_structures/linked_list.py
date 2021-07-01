@@ -90,9 +90,9 @@ if __name__ == '__main__':
   l2 = list(range(int(1e5)))
   ic(len(l2))
 
-  for doubly in [True, False]:
-    ic('doubly linked: {}'.format(doubly))
-    ll = LinkedList(l, doubly)
+  for doubly_test in [True, False]:
+    ic('doubly linked: {}'.format(doubly_test))
+    ll = LinkedList(l, doubly_test)
     ic(ll)
     ic(ll.__str__())
 
@@ -102,9 +102,9 @@ if __name__ == '__main__':
     ic(ll.delete(3))
     ic(ll.__str__())
 
-    ll2 = LinkedList(l2, doubly)
+    ll2 = LinkedList(l2, doubly_test)
     ic(ll2)
-    if doubly:
+    if doubly_test:
       tic()
       ic('... worst case search')
       one_node = ll2.search(1)

@@ -1,9 +1,5 @@
 from typing import List
 
-from icecream import ic
-from numpy import array
-from numpy.random import PCG64, Generator
-
 Vector = List[float]
 Matrix = List[Vector]
 
@@ -46,9 +42,12 @@ def nullify_col(mat: Matrix, col: int) -> None:
 
 if __name__ == '__main__':
 
+  from icecream import ic
+  from numpy.random import PCG64, Generator
+
   rng = Generator(PCG64(12345))
   for _ in range(3):
-    mat = rng.integers(0, 5, size=[4, 5], endpoint=True)
-    ic(mat)
-    zero_matrix(mat)
-    ic(mat)
+    mat0 = rng.integers(0, 5, size=[4, 5], endpoint=True)
+    ic(mat0)
+    zero_matrix(mat0)
+    ic(mat0)
