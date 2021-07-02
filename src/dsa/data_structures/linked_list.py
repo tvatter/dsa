@@ -1,7 +1,7 @@
 # from dsa.misc.class_generator import add_property, generate_class
 
 # generate_class('LinkedList', 'src/dsa/data_structures/linked_list.py')
-# add_property('LinkedList', 'src/dsa/data_structures/linked_list.py', 'head')
+# add_property('LinkedList', 'src/dsa/data_structures/linked_list.py', 'head', setter=True)
 # add_property('LinkedList', 'src/dsa/data_structures/linked_list.py', 'doubly')
 
 from dsa.data_structures.node import Node
@@ -16,11 +16,11 @@ class LinkedList:
       self.insert(key)
 
   def __str__(self):
-    current_node = self._head
+    curr_node = self._head
     to_print = []
-    while current_node:
-      to_print.append(str(current_node.key))
-      current_node = current_node.next_node
+    while curr_node:
+      to_print.append(str(curr_node.key))
+      curr_node = curr_node.next_node
 
     if self._doubly:
       return '<=>'.join(to_print)
@@ -34,46 +34,80 @@ class LinkedList:
     self._head = new_node
 
   def search(self, key):
-    current_node = self._head
-    while current_node:
-      if current_node.key == key:
-        return current_node
+    curr_node = self._head
+    while curr_node:
+      if curr_node.key == key:
+        return curr_node
       else:
-        current_node = current_node.next_node
+        curr_node = curr_node.next_node
 
     return None
 
-  def delete_by_key(self, key):
-    current_node = self._head
-    prev_node = None  # To handle both singly and doubly linked lists
-    while current_node:
-      if current_node.key == key:
-        self.delete_by_ref(current_node, prev_node)
-        break
-      prev_node = current_node
-      current_node = current_node.next_node
+  def reverse(self):
 
-  def delete_by_ref(self, current_node, prev_node):
-    next_node = current_node.next_node
-    if prev_node is None:
-      self._head = next_node
-      if self._doubly:
-        self._head.prev_node = None
+    prev_node = None
+    curr_node = self.head
+
+    while curr_node:
+      next_node = curr_node.next_node
+      curr_node.next_node = prev_node
+      if self.doubly:
+        curr_node.prev_node = next_node
+
+      prev_node = curr_node
+      curr_node = next_node
+
+    self.head = prev_node
+
+  def delete_by_key(self, key):
+    curr_node = self._head
+    prev_node = None  # To handle both singly and doubly linked lists
+    while curr_node:
+      if curr_node.key == key:
+        self.delete_by_ref(curr_node, prev_node)
+        break
+      prev_node = curr_node
+      curr_node = curr_node.next_node
+
+  def delete_by_ref(self, node, prev_node=None):
+    next_node = node.next_node
+    if prev_node is None and self.doubly:
+      prev_node = node.prev_node
+
+    if next_node is not None:
+      node.key = next_node.key
+      node.data = next_node.data
+      node.next_node = next_node.next_node
+      if self.doubly and next_node.next_node is not None:
+        next_node.next_node.prev_node = node
     else:
-      prev_node.next_node = next_node
-      if self._doubly:
-        next_node.prev_node = prev_node
+      if self.doubly:
+        if prev_node is None:
+          self.head = None
+        else:
+          prev_node.next_node = None
+      else:
+        if prev_node is None:
+          print(
+              'Cannot delete the last node of a singly linked list by reference without the previous node'
+          )
+        else:
+          prev_node.next_node = None
 
   def delete(self, key):
-    # O(1) for doubly linked lists
-    if isinstance(key, Node) and self._doubly:
+    # O(1) for if we have access to the node
+    if isinstance(key, Node):
       self.delete_by_ref(key, key.prev_node)
-    else:  # O(n) otherwise because it's basically a search
+    else:  # O(n) otherwise because it's basically a traversal
       self.delete_by_key(key)
 
   @property
   def head(self):
     return self._head
+
+  @head.setter
+  def head(self, new_head):
+    self._head = new_head
 
   @property
   def doubly(self):
@@ -96,10 +130,19 @@ if __name__ == '__main__':
     ic(ll)
     ic(ll.__str__())
 
+    ic(ll.reverse())
+    ic(ll.__str__())
+
     ic(ll.delete(4))
     ic(ll.__str__())
 
     ic(ll.delete(3))
+    ic(ll.__str__())
+
+    ic(ll.delete(ll.head.next_node))
+    ic(ll.__str__())
+
+    ic(ll.delete(ll.head))
     ic(ll.__str__())
 
     ll2 = LinkedList(l2, doubly_test)

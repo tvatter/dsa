@@ -1,7 +1,7 @@
 # from dsa.misc.class_generator import add_property, generate_class
 
 # generate_class('Node', 'src/dsa/data_structures/node.py')
-# add_property('Node', 'src/dsa/data_structures/node.py', 'key')
+# add_property('Node', 'src/dsa/data_structures/node.py', 'key', setter=True)
 # add_property('Node',
 #              'src/dsa/data_structures/node.py',
 #              'next_node',
@@ -24,6 +24,10 @@ class Node:
   @property
   def key(self):
     return self._key
+
+  @key.setter
+  def key(self, new_key):
+    self._key = new_key
 
   @property
   def next_node(self):
