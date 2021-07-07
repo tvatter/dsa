@@ -9,11 +9,12 @@ from dsa.data_structures.node import Node
 
 class LinkedList:
   """The LinkedList class"""
-  def __init__(self, array, doubly=True):
+  def __init__(self, array=None, doubly=True):
     self._head = None
     self._doubly = doubly
-    for key in array:
-      self.insert(key)
+    if array is not None:
+      for key in array:
+        self.insert(key)
 
   def __str__(self):
     curr_node = self._head
@@ -27,9 +28,12 @@ class LinkedList:
     else:
       return '->'.join(to_print)
 
-  def insert(self, key=None):
-    new_node = Node(key, next_node=self._head)
-    if self._head is not None and self._doubly:
+  def isempty(self):
+    return bool(self.head is None)
+
+  def insert(self, key=None, data=None):
+    new_node = Node(key, next_node=self._head, data=data)
+    if not self.isempty() and self._doubly:
       self._head.prev_node = new_node
     self._head = new_node
 

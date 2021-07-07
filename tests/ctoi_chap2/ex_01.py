@@ -27,9 +27,23 @@ l2 = [1, 1, 2, 2, 3, 3]
 for doubly_test in [True, False]:
   ic('doubly linked: {}'.format(doubly_test))
   ll = LinkedList(l, doubly_test)
+  ic(str(ll))
+  remove_duplicates(ll)
+  ic(str(ll))
+
+  l.reverse()
+  ll = LinkedList(l, doubly_test)
+  ic(str(ll))
   remove_duplicates(ll)
   ic(str(ll))
 
   ll2 = LinkedList(l2, doubly_test)
+  ic(str(ll2))
+  remove_duplicates(ll2)
+  ic(str(ll2))
+
+  l2.reverse()
+  ll2 = LinkedList(l2, doubly_test)
+  ic(str(ll2))
   remove_duplicates(ll2)
   ic(str(ll2))
