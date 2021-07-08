@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-# from dsa.data_structures import LinkedList, Node
 from dsa.data_structures import Queue
 
 

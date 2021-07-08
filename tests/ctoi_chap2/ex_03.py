@@ -1,7 +1,7 @@
-from dsa.data_structures import LinkedList, Node
+from dsa.data_structures import LinkedList, ListNode
 
 
-def delete_middle_node(mid_node: Node):
+def delete_middle_node(mid_node: ListNode):
   next_node = mid_node.next_node
   mid_node.key = next_node.key
   mid_node.data = next_node.data

@@ -3,7 +3,7 @@
 # generate_class('Stack', 'src/dsa/data_structures/stack.py')
 # add_property('Stack', 'src/dsa/data_structures/stack.py', 'top')
 
-from dsa.data_structures.node import Node
+from dsa.data_structures.list_node import ListNode
 
 
 class Stack:
@@ -19,7 +19,7 @@ class Stack:
     return bool(self.top is None)
 
   def push(self, item):
-    new_node = Node(data=item, prev_node=self.top)
+    new_node = ListNode(data=item, prev_node=self.top)
     if self.top is not None:
       self._top.next_node = new_node
     self._top = new_node

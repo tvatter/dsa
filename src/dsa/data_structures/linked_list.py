@@ -4,7 +4,7 @@
 # add_property('LinkedList', 'src/dsa/data_structures/linked_list.py', 'head', setter=True)
 # add_property('LinkedList', 'src/dsa/data_structures/linked_list.py', 'doubly')
 
-from dsa.data_structures.node import Node
+from dsa.data_structures.list_node import ListNode
 
 
 class LinkedList:
@@ -20,7 +20,7 @@ class LinkedList:
     curr_node = self._head
     to_print = []
     while curr_node:
-      to_print.append(str(curr_node.key))
+      to_print.append(str(curr_node))
       curr_node = curr_node.next_node
 
     if self._doubly:
@@ -32,7 +32,7 @@ class LinkedList:
     return bool(self.head is None)
 
   def insert(self, key=None, data=None):
-    new_node = Node(key, next_node=self._head, data=data)
+    new_node = ListNode(key, next_node=self._head, data=data)
     if not self.isempty() and self._doubly:
       self._head.prev_node = new_node
     self._head = new_node
@@ -100,7 +100,7 @@ class LinkedList:
 
   def delete(self, key):
     # O(1) for if we have access to the node
-    if isinstance(key, Node):
+    if isinstance(key, ListNode):
       self.delete_by_ref(key, key.prev_node)
     else:  # O(n) otherwise because it's basically a traversal
       self.delete_by_key(key)

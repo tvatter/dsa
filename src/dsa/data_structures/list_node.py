@@ -1,20 +1,26 @@
 # from dsa.misc.class_generator import add_property, generate_class
 
-# generate_class('Node', 'src/dsa/data_structures/node.py')
-# add_property('Node', 'src/dsa/data_structures/node.py', 'key', setter=True)
-# add_property('Node',
-#              'src/dsa/data_structures/node.py',
+# generate_class('ListNode', 'src/dsa/data_structures/list_node.py')
+# add_property('ListNode',
+#              'src/dsa/data_structures/list_node.py',
+#              'key',
+#              setter=True)
+# add_property('ListNode',
+#              'src/dsa/data_structures/list_node.py',
 #              'next_node',
 #              setter=True)
-# add_property('Node',
-#              'src/dsa/data_structures/node.py',
+# add_property('ListNode',
+#              'src/dsa/data_structures/list_node.py',
 #              'prev_node',
 #              setter=True)
-# add_property('Node', 'src/dsa/data_structures/node.py', 'data', setter=True)
+# add_property('ListNode',
+#              'src/dsa/data_structures/list_node.py',
+#              'data',
+#              setter=True)
 
 
-class Node:
-  """The Node class"""
+class ListNode:
+  """The ListNode class"""
   def __init__(self, key=None, next_node=None, prev_node=None, data=None):
     self._key = key
     self._next_node = next_node
@@ -52,3 +58,6 @@ class Node:
   @data.setter
   def data(self, new_data):
     self._data = new_data
+
+  def __str__(self):
+    return str(self.key)

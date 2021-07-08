@@ -4,7 +4,7 @@
 # add_property('Queue', 'src/dsa/data_structures/queue.py', 'head')
 # add_property('Queue', 'src/dsa/data_structures/queue.py', 'tail')
 
-from dsa.data_structures.node import Node
+from dsa.data_structures.list_node import ListNode
 
 
 class Queue:
@@ -25,7 +25,7 @@ class Queue:
     return bool(self.head is None)
 
   def enqueue(self, item):
-    new_node = Node(data=item, next_node=self._tail)
+    new_node = ListNode(data=item, next_node=self._tail)
     if self.isempty():
       self._head = new_node
       self._tail = new_node
