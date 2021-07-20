@@ -12,21 +12,47 @@ from abc import ABC, abstractmethod
 
 class Heap(ABC):
   """The Heap class"""
-  def __init__(self, mylist=None):
-    if mylist is None:
-      mylist = []
-    self._heap_size = len(mylist)
-    self._heap = mylist
+  def __init__(self, values=None, handles=None):
+    if values is None:
+      values = []
+    self._heap_size = len(values)
+    self._values = values
+    if handles is not None and len(handles) != len(values):
+      raise ValueError('Handles should have the same size as the values')
+    self._handles = handles
+    if self._handles is not None:
+      self._keys = {
+          handle: key
+          for handle, key in zip(handles, range(len(values)))
+      }
+    else:
+      self._keys = None
     for key in range(int(self._heap_size / 2) - 1, -1, -1):
-      self.heapify(self._heap, key)
+      self.heapify(key)
 
   @property
   def heap_size(self):
     return self._heap_size
 
   @property
+  def values(self):
+    return self._values
+
+  @property
+  def keys(self):
+    return self._keys
+
+  @property
+  def handles(self):
+    return self._handles
+
   @abstractmethod
-  def sign(self):
+  def compare(self, left, right):
+    pass
+
+  @property
+  @abstractmethod
+  def default_value(self):
     pass
 
   def parent(self, key):
@@ -38,91 +64,134 @@ class Heap(ABC):
   def right(self, key):
     return 2 * key + 2
 
-  def heapify(self, mylist, key):
+  def isempty(self):
+    return bool(self._heap_size == 0)
+
+  def _swap(self, key1, key2):
+    self._values[key1], self._values[key2] = self._values[key2], self._values[
+        key1]
+    if self._handles is not None:
+      self._handles[key1], self._handles[key2] = self._handles[
+          key2], self._handles[key1]
+      self._update_keys(key1)
+      self._update_keys(key2)
+
+  def _update_keys(self, key):
+    self._keys[self._handles[key]] = key
+
+  def heapify(self, key):
     left = self.left(key)
     right = self.right(key)
-    sign = self.sign
-    if left < len(mylist) and sign * mylist[left] > sign * mylist[key]:
+    if left < self._heap_size and self.compare(self._values[left],
+                                               self._values[key]):
       tmp = left
     else:
       tmp = key
-    if right < len(mylist) and sign * mylist[right] > sign * mylist[tmp]:
+    if right < self._heap_size and self.compare(self._values[right],
+                                                self._values[tmp]):
       tmp = right
     if tmp != key:
-      mylist[tmp], mylist[key] = mylist[key], mylist[tmp]
-      self.heapify(mylist, tmp)
+      self._swap(key, tmp)
+      self.heapify(tmp)
 
   def peek(self):
-    if self.heap_size == 0:
+    if self._heap_size == 0:
       raise IndexError('Heap underflow')
     else:
-      return self[0]
+      if self._handles is None:
+        return self._values[0]
+      else:
+        return self._handles[0], self._values[0]
 
   def pop(self):
-    heap_size = self.heap_size
+    heap_size = self._heap_size
     if heap_size == 0:
       raise IndexError('Heap underflow')
     else:
-      tmp = self[0]
-      self[0] = self[heap_size - 1]
-      del self[heap_size - 1]
+      value = self._values[0]
+      self._values[0] = self._values[heap_size - 1]
+      del self._values[heap_size - 1]
+      if self._handles is not None:
+        handle = self._handles[0]
+        self._handles[0] = self._handles[heap_size - 1]
+        self._update_keys(0)
+        del self._handles[heap_size - 1]
       self._heap_size -= 1
-      self.heapify(self, 0)
-      return tmp
+      self.heapify(0)
+      if self._handles is None:
+        return value
+      else:
+        return handle, value
 
   def update_value(self, key, value):
-    sign = self.sign
-    if sign * value > sign * self[key]:
-      tmp = 'smaller' if sign == 1 else 'bigger'
+    if not self.compare(value, self._values[key]):
+      tmp = 'smaller' if self.default_value < 0 else 'bigger'
       raise ValueError('New value is {} than current value'.format(tmp))
-    self[key] = value
+    self._values[key] = value
     parent = self.parent(key)
-    while key > 0 and sign * self[parent] < sign * self[key]:
-      heap[parent], heap[key] = heap[key], heap[parent]
+    while key > 0 and not self.compare(self._values[parent],
+                                       self._values[key]):
+      self._swap(parent, key)
       key = parent
       parent = self.parent(key)
 
-  def insert(self, value):
+  def insert(self, value, handle=None):
+
+    if self._handles is not None:
+      handle = handle if handle is not None else self._heap_size
+      self._handles.append(handle)
+      self._keys[handle] = self._heap_size
+
+    default_value = self.default_value
+    if isinstance(value, list):
+      default_value = [default_value] * len(value)
+    self._values.append(default_value)
+
     self._heap_size += 1
-    self._heap.append(self.sign * float('inf'))
     self.update_value(self._heap_size - 1, value)
 
-  def __getitem__(self, key):
-    return self._heap.__getitem__(key)
-
-  def __setitem__(self, key, value):
-    self._heap.__setitem__(key, value)
-
-  def __delitem__(self, key):
-    self._heap.__delitem__(key)
-
   def __len__(self):
-    return self.heap_size
+    return self._heap_size
 
   def __str__(self):
-    return str(self._heap)
+    if self._handles is None:
+      return str(self._values)
+    else:
+      return str({
+          handle: value
+          for handle, value in zip(self._handles, self._values)
+      })  # return str({
+    #     handle: [value, self._keys[handle]]
+    #     for handle, value in zip(self._handles, self._values)
+    # })
 
 
 class MaxHeap(Heap):
+  def compare(self, left, right):
+    return left > right
+
   @property
-  def sign(self):
-    return 1
+  def default_value(self):
+    return -1 * float('inf')
 
 
 class MinHeap(Heap):
+  def compare(self, left, right):
+    return left < right
+
   @property
-  def sign(self):
-    return -1
+  def default_value(self):
+    return float('inf')
 
 
-def heapsort(mylist, asc=True):
-  heap = MaxHeap(mylist) if asc else MinHeap(mylist)
+def heapsort(values, asc=True):
+  heap = MaxHeap(values) if asc else MinHeap(values)
   for key in range(len(heap) - 1, 0, -1):
-    tmp = heap[key]
-    heap[key] = heap[0]
-    heap[0] = tmp
+    tmp = heap.values[key]
+    heap.values[key] = heap.values[0]
+    heap.values[0] = tmp
     heap._heap_size -= 1
-    heap.heapify(heap, 0)
+    heap.heapify(0)
 
 
 if __name__ == '__main__':
@@ -130,9 +199,11 @@ if __name__ == '__main__':
   from icecream import ic
   for heap_type in [MaxHeap, MinHeap]:
     ic(heap_type)
-    aa = [4, 1, 3, 2, 16, 9, 10, 14, 8, 7]
-    ic(aa)
-    heap = heap_type(aa)
+
+    ic('.... without handles')
+    values = [4, 1, 3, 2, 16, 9, 10, 14, 8, 7]
+    ic(values)
+    heap = heap_type(values)
     ic(heap.__str__())
     ic(heap.pop())
     ic(heap.__str__())
@@ -140,10 +211,25 @@ if __name__ == '__main__':
     ic(heap.insert(2.5))
     ic(heap.__str__())
 
-    aa = [4, 1, 3, 2, 16, 9, 10, 14, 8, 7]
+    ic('.... with handles')
+    from string import ascii_lowercase
+    ids = list(ascii_lowercase[:len(values) - 1])
+    values = [4, 1, 3, 2, 16, 9, 10, 14, 8, 7]
+    ic({a: b for a, b in zip(ids, values)})
+    heap = heap_type(values, ids)
+    ic(heap.__str__())
+    ic(heap.pop())
+    ic(heap.__str__())
+    ic(heap.insert(7.5, 'foo'))
+    ic(heap.__str__())
+    ic(heap.insert(2.5, 'bar'))
+    ic(heap.__str__())
+
+    ic('..... sorting')
+    values = [4, 1, 3, 2, 16, 9, 10, 14, 8, 7]
     if 'Max' in str(heap_type):
-      ic(heapsort(aa, asc=True))
+      ic(heapsort(values, asc=True))
     else:
-      ic(heapsort(aa, asc=False))
-    ic(aa)
+      ic(heapsort(values, asc=False))
+    ic(values)
     ic('----------')

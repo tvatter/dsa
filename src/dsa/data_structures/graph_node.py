@@ -1,38 +1,45 @@
+# from functools import total_ordering
+
 # from dsa.misc.class_generator import add_property, generate_class
 
-# generate_class('TreeNode', 'src/dsa/data_structures/tree_node.py')
-# add_property('TreeNode',
-#              'src/dsa/data_structures/tree_node.py',
+# generate_class('GraphNode', 'src/dsa/data_structures/graph_node.py')
+# add_property('GraphNode',
+#              'src/dsa/data_structures/graph_node.py',
 #              'key',
 #              setter=True)
-# add_property('TreeNode',
-#              'src/dsa/data_structures/tree_node.py',
+# add_property('GraphNode',
+#              'src/dsa/data_structures/graph_node.py',
 #              'children',
 #              setter=True)
-# add_property('TreeNode',
-#              'src/dsa/data_structures/tree_node.py',
+# add_property('GraphNode',
+#              'src/dsa/data_structures/graph_node.py',
 #              'data',
 #              setter=True)
 
-# generate_class('BinTreeNode', 'src/dsa/data_structures/tree_node.py')
-# add_property('BinTreeNode',
-#              'src/dsa/data_structures/tree_node.py',
+# generate_class('BinaryNode', 'src/dsa/data_structures/graph_node.py')
+# add_property('BinaryNode',
+#              'src/dsa/data_structures/graph_node.py',
 #              'left',
 #              setter=True)
-# add_property('BinTreeNode',
-#              'src/dsa/data_structures/tree_node.py',
+# add_property('BinaryNode',
+#              'src/dsa/data_structures/graph_node.py',
 #              'right',
-#              setter=True)
+#              setter=true)
+# add_property('BinaryNode',
+#              'src/dsa/data_structures/graph_node.py',
+#              'parent',
+#              setter=true)
 
-# generate_class('TrieNode', 'src/dsa/data_structures/tree_node.py')
+# generate_class('TrieNode', 'src/dsa/data_structures/graph_node.py')
 # add_property('TrieNode',
-#              'src/dsa/data_structures/tree_node.py',
+#              'src/dsa/data_structures/graph_node.py',
 #              'is_word',
 #              setter=True)
 
 
-class TreeNode:
-  """The TreeNode class"""
+# @total_ordering
+class GraphNode:
+  """The GraphNode class"""
   def __init__(self, key=None, children=None, data=None):
     self._key = key
     self._children = children
@@ -65,11 +72,21 @@ class TreeNode:
   def __str__(self):
     return str(self.key)
 
+  # def __eq__(self, other):
+  #   return self.data.__eq__(other.data['meta'])
 
-class BinTreeNode(TreeNode):
-  """The BinTreeNode class"""
-  def __init__(self, key=None, left=None, right=None, data=None):
+  # def __le__(self, other):
+  #   return self.data.__le__(other.data['meta'])
+
+  # def __lt__(self, other):
+  #   return self.data.__lt__(other.data['meta'])
+
+
+class BinaryNode(GraphNode):
+  """The BinaryNode class"""
+  def __init__(self, key=None, left=None, right=None, parent=None, data=None):
     super().__init__(key, [left, right], data)
+    parent_ = parent
 
   @property
   def left(self):
@@ -87,8 +104,16 @@ class BinTreeNode(TreeNode):
   def right(self, new_right):
     self.children[1] = new_right
 
+  @property
+  def parent(self):
+    return self._parent
 
-class TrieNode(TreeNode):
+  @parent.setter
+  def parent(self, new_parent):
+    self._parent = new_parent
+
+
+class TrieNode(GraphNode):
   """The TrieNode class"""
   def __init__(self, key='', children=None):
     if children is None:
