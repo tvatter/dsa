@@ -60,3 +60,7 @@ def to_bin(num):
 
 def is_power_of_two(num):
   return (num & (num - 1)) == 0
+
+
+def trailing_zeros(num):
+  return 0 if num == 0 else (num & -num).bit_length() - 1
