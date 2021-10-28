@@ -1,0 +1,198 @@
+HW7: relational2
+
+In the whole exercise, do NOT use a `for`, `while`, or `repeat` loop!
+
+1. Load the `tidyverse`, `scales` and `lubridates` packages and use
+   `theme_set(theme_light())` to set the theme for the rest of the exercise.
+   Then, use `read_csv` to load
+     - `/course/data/guest_house/booking.csv` and assign it to a tibble `booking`,
+     - `/course/data/guest_house/guest.csv` and assign it to a tibble `guest`,
+     - `/course/data/guest_house/rate.csv` and assign it to a tibble `rate`,
+     - `/course/data/guest_house/room.csv` and assign it to a tibble `room`.
+
+   To check your answer:
+
+   The output of `print(booking, n = 5)` is
+
+   ```
+   # A tibble: 347 x 8
+     booking_id booking_date room_no guest_id occupants room_type_reque…
+          <dbl> <chr>          <dbl>    <dbl>     <dbl> <chr>
+   1       5001 11/3/2016        101     1027         1 single
+   2       5002 11/3/2016        102     1179         1 double
+   3       5003 11/3/2016        103     1106         2 double
+   4       5004 11/3/2016        104     1238         1 double
+   5       5005 11/3/2016        105     1540         3 family
+   # … with 342 more rows, and 2 more variables: nights <dbl>,
+   #   arrival_time <time>
+   ```
+
+   The output of `print(guest, n = 5)` is
+
+   ```
+   # A tibble: 649 x 4
+        id first_name last_name address
+     <dbl> <chr>      <chr>     <chr>
+   1  1001 Jim        Dowd      Lewisham West and Penge
+   2  1002 Lyn        Brown     West Ham
+   3  1003 Ann        Clwyd     Cynon Valley
+   4  1004 Nic        Dakin     Scunthorpe
+   5  1005 Pat        Glass     North West Durham
+   # … with 644 more rows
+   ```
+
+   The output of `print(rate, n = 5)` is
+
+   ```
+   # A tibble: 8 x 3
+     room_type occupancy amount
+     <chr>         <dbl>  <dbl>
+   1 double            1     56
+   2 double            2     72
+   3 family            1     56
+   4 family            2     72
+   5 family            3     84
+   # … with 3 more rows
+   ```
+
+   The output of `print(room, n = 5)` is
+
+   ```
+   # A tibble: 30 x 3
+        id room_type max_occupancy
+     <dbl> <chr>             <dbl>
+   1   101 single                1
+   2   102 double                2
+   3   103 double                2
+   4   104 double                2
+   5   105 family                3
+   # … with 25 more rows
+   ```
+
+
+
+
+
+2. From `booking`, extract a tibble `room_earning` by left-joining the
+   `rate` tibble. Then, add a column `earning` containing the earning of
+   each booking, defined as `amount` times `nights`.
+   Finally, some tidying:
+     - Convert `booking_date` to class `"Date"`.
+     - Convert `room_no` to a factor with levels ordered by median `earning`.
+     - Sort by `booking_date`, breaking the ties by `room_no`.
+     - Select the columns `booking_date`, `room_no`, `guest_id`,
+       `nights`, and `earning`.
+   Hint: to do that, you can use `left_join()`, `mutate()`, `mdy()`,
+   `fct_order()`, `arrange()`  and `select()`.
+
+   To check your answer:
+
+   The output of `print(room_earning, n = 5)` is
+
+   ```
+   # A tibble: 347 x 5
+     booking_date room_no guest_id nights earning
+     <date>       <fct>      <dbl>  <dbl>   <dbl>
+   1 2016-11-03   309         1060      1      56
+   2 2016-11-03   102         1179      2     112
+   3 2016-11-03   301         1406      4     192
+   4 2016-11-03   108         1136      1      56
+   5 2016-11-03   210         1626      5     360
+   # … with 342 more rows
+   ```
+
+   The output of `print((room_earning %>% pull(room_no))[1:5], max.levels = 3)` is
+
+   ```
+   [1] 309 102 301 108 210
+   30 Levels: 309 102 ... 203
+   ```
+
+
+
+
+
+3. Let's visualize the earnings per rooms using a boxplot.
+   To do this, use `room_earning` and:
+     - `ggplot` to initialize the plot,
+     - `geom_boxplot()` to get the boxplot,
+     - `scale_y_continuous()` with `label_dollar()` to set the y-axis labels
+       to dollar format,
+     - `coord_flip()` to flip the axes,
+     - `labs()` to set the
+       - title as `"Most rooms have earnings between $100 and $300"`,
+       - x-axis as `"Room number"`,
+       - y-axis as `"Earnings"`.
+   Store the plot into a `ggplot` object `room_earning_plot`.
+
+
+
+
+
+5. From `guest`, extract a tibble `guest_spending` that stores, for the 10
+   "biggest clients":
+     - `name`, the full name of the `guest`,
+     - `nights`, the total number of nights spent by the guest,
+     - `spending`, the total dollar amount spent by the guest.
+   Here, the 10 biggest clients means the 10 that spent the most.
+   Make sure that:
+     - `name` is a factor whose levels are ordered by median `spending`,
+     - you sort the data by descending total spending.
+   You can use :
+     - `mutate()` and `paste()` to concatenate `first_name` and
+       `last_name` in `guest`,
+     - `right_join()` to join the aforementioned tibble with
+       `room_earning`,
+     - `group_by()`  and `summarize()` to compute the total number of
+       `nights` and `spending` for each guest,
+     - `arrange()` and `head()` to sort and select the biggest spenders,
+     - `fct_reorder()` to transform `name` into factor with appropriate
+       levels ordering.
+
+   To check your answer:
+
+   The output of `print(guest_spending, n = 5)` is
+
+   ```
+   # A tibble: 10 x 3
+     name                nights spending
+     <fct>                <dbl>    <dbl>
+   1 Sir Edward Garnier      11      780
+   2 Robert Halfon           10      768
+   3 Angela Rayner           14      744
+   4 Karin Smyth             11      696
+   5 Sir Alan Haselhurst     11      680
+   # … with 5 more rows
+   ```
+
+   The output of `print((guest_spending %>% pull(name))[1:3], max.levels = 3)` is
+
+   ```
+   [1] Sir Edward Garnier Robert Halfon      Angela Rayner
+   10 Levels: Craig Tracey Hannah Bardell ... Sir Edward Garnier
+   ```
+
+
+
+
+
+6. Produce a barplot of the spendings of the 10 biggest clients.
+   The bars should be horizontal and ordered by total spending
+   from highest (on top of the figure) to lowest.
+   To do this, use `guest_spending` and:
+     - `ggplot` to initialize the plot,
+     - `geom_col()` to get the barplot,
+     - `scale_y_continuous()` with `label_dollar()` to set the y-axis labels
+       to dollar format,
+     - `coord_flip()` to flip the axes,
+     - `labs()` to set the
+       - title as `"Top 10 guests all spent more than $600"`,
+       - x-axis as `"Name"`,
+       - y-axis as `"Spending"`.
+   Store the plot into a `ggplot` object `guest_spending_plot`.
+
+
+
+
+
+

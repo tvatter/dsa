@@ -1,0 +1,216 @@
+HW7: weather
+
+In the whole exercise, do NOT use a `for`, `while`, or `repeat` loop!
+
+1. Load the `tidyverse`,`lubridates` and `rattle` packages and use
+   `theme_set(theme_light())` to set the theme for the rest of the exercise.
+   Then, use `data(weather)` to read the dataset `weather` from the
+   `rattle` package, and convert it into a tibble `weather` using
+   `as_tibble()`.
+
+   To check your answer:
+
+   The output of `print(weather, n = 5)` is
+
+   ```
+   # A tibble: 366 x 24
+     Date       Location MinTemp MaxTemp Rainfall Evaporation Sunshine
+     <date>     <fct>      <dbl>   <dbl>    <dbl>       <dbl>    <dbl>
+   1 2007-11-01 Canberra     8      24.3      0           3.4      6.3
+   2 2007-11-02 Canberra    14      26.9      3.6         4.4      9.7
+   3 2007-11-03 Canberra    13.7    23.4      3.6         5.8      3.3
+   4 2007-11-04 Canberra    13.3    15.5     39.8         7.2      9.1
+   5 2007-11-05 Canberra     7.6    16.1      2.8         5.6     10.6
+   # … with 361 more rows, and 17 more variables: WindGustDir <ord>,
+   #   WindGustSpeed <dbl>, WindDir9am <ord>, WindDir3pm <ord>,
+   #   WindSpeed9am <dbl>, WindSpeed3pm <dbl>, Humidity9am <int>,
+   #   Humidity3pm <int>, Pressure9am <dbl>, Pressure3pm <dbl>,
+   #   Cloud9am <int>, Cloud3pm <int>, Temp9am <dbl>, Temp3pm <dbl>,
+   #   RainToday <fct>, RISK_MM <dbl>, RainTomorrow <fct>
+   ```
+
+
+
+
+
+2. From `weather`, extract two tibbles `weather_9am` and `weather_3pm`.
+   `weather_9am` should contain the column `Date`, followed by all the
+   variables which names ending with `"9am"`
+   Note that:
+     - `"9am"` should be removed from the names of the variables.
+     - The `Date` should be converted into a date-time object as follows.
+       Instead of `"Y-M-D"`, it should  `"Y-M-D 09:00:00 AECT"`,
+       where `"AECT"` is the time zone code for Australian Eastern Time
+       `09:00:00` corresponds to 9am.
+
+   To check your answer:
+
+   The output of `print(weather_9am, n = 5)` is
+
+   ```
+   # A tibble: 366 x 7
+     Date                WindDir WindSpeed Humidity Pressure Cloud  Temp
+     <dttm>              <ord>       <dbl>    <int>    <dbl> <int> <dbl>
+   1 2007-11-01 09:00:00 SW              6       68    1020.     7  14.4
+   2 2007-11-02 09:00:00 E               4       80    1012.     5  17.5
+   3 2007-11-03 09:00:00 N               6       82    1010.     8  15.4
+   4 2007-11-04 09:00:00 WNW            30       62    1006.     2  13.5
+   5 2007-11-05 09:00:00 SSE            20       68    1018.     7  11.1
+   # … with 361 more rows
+   ```
+
+   The output of `print(weather_3pm, n = 5)` is
+
+   ```
+   # A tibble: 366 x 7
+     Date                WindDir WindSpeed Humidity Pressure Cloud  Temp
+     <dttm>              <ord>       <dbl>    <int>    <dbl> <int> <dbl>
+   1 2007-11-01 15:00:00 NW             20       29    1015      7  23.6
+   2 2007-11-02 15:00:00 W              17       36    1008.     3  25.7
+   3 2007-11-03 15:00:00 NNE             6       69    1007.     7  20.2
+   4 2007-11-04 15:00:00 W              24       56    1007      7  14.1
+   5 2007-11-05 15:00:00 ESE            28       49    1018.     7  15.4
+   # … with 361 more rows
+   ```
+
+
+
+
+
+3. From the tibbles `weather_9am` and `weather_3pm`, create a tibble
+   `humidity_temp` by
+     - full-joining them,
+     - creating `hour`, a factor variable corresponding to the hour of day,
+     - creating `yday`, a numeric variable corresponding to the day of year,
+     - selecting the `yday`, `hour`, `Humidity`, and `Temp` columns,
+     - making the data longer by pivoting around the `Humidity` and `Temp`
+       columns,
+     - sorting by day of year and hour.
+   To do so, you can use `full_join()` (or `bind_rows()`), `mutate()`,
+   `dplyr::select()`, `pivot_longer()` and `arrange()`.
+
+   To check your answer:
+
+   The output of `print(humidity_temp, n = 5)` is
+
+   ```
+   # A tibble: 1,464 x 4
+      yday hour  name     value
+     <dbl> <fct> <chr>    <dbl>
+   1     1 9     Humidity  50
+   2     1 9     Temp      21.9
+   3     1 15    Humidity  20
+   4     1 15    Temp      31.8
+   5     2 9     Humidity  43
+   # … with 1,459 more rows
+   ```
+
+
+
+
+
+4. Produce a smooth regression plot of `value` against `yday`,
+   colored by `hour` and with line type by `name`.
+   To do this, use `humidity_temp` and:
+     - `ggplot` to initialize the plot,
+     - `geom_smooth()` to get the smooth regression plot, and set the `se`
+       as `FALSE`, and the `method` as `"loess"`,
+     - `labs()` to set the
+       - title as `"Temperature and humidity are negatively correlated"`,
+       - x-axis as `"Day of the year"`,
+       - y-axis as `"Humidity (percent) and temperature (degrees C)"`,
+       - color as `"Hour"`,
+       - line type as `"Measurement"`,
+   Store the plot into a `ggplot` object `temp_humidity_plot`.
+
+
+
+
+
+5. From `weather_9am` and `weather_3pm`, extract two tibbles
+   `weather_wind_9am` and `weather_wind_3pm` by
+     - selecting the variables `WindDir` and `Temp`,
+     - adding a variable `Hour` (respectively as `"9am"` and `"3pm"`).
+   To do that, you can use `dplyr::select()` and `mutate()`.
+   Then, from the tibbles `weather_wind_9am` and `weather_wind_3pm`,
+   create a tibble `weather_wind` by
+     - full-joining them,
+     - dropping the NAs,
+     - creating `WindMainDir`, a factor variable corresponding to the
+       first letter of `WindDir`,
+     - transforming `Hour` into a factor with levels as `c("9am", "3pm")`.
+   To do so, you can use `full_join()`, `drop_na()`, `str_sub()`,
+   and `mutate()`.
+
+   To check your answer:
+
+   The output of `print(weather_wind_9am, n = 5)` is
+
+   ```
+   # A tibble: 366 x 3
+     WindDir  Temp Hour
+     <ord>   <dbl> <chr>
+   1 SW       14.4 9am
+   2 E        17.5 9am
+   3 N        15.4 9am
+   4 WNW      13.5 9am
+   5 SSE      11.1 9am
+   # … with 361 more rows
+   ```
+
+   The output of `print(weather_wind_3pm, n = 5)` is
+
+   ```
+   # A tibble: 366 x 3
+     WindDir  Temp Hour
+     <ord>   <dbl> <chr>
+   1 NW       23.6 3pm
+   2 W        25.7 3pm
+   3 NNE      20.2 3pm
+   4 W        14.1 3pm
+   5 ESE      15.4 3pm
+   # … with 361 more rows
+   ```
+
+   The output of `print(weather_wind, n = 5)` is
+
+   ```
+   # A tibble: 700 x 4
+     WindDir  Temp Hour  WindMainDir
+     <ord>   <dbl> <fct> <fct>
+   1 SW       14.4 9am   S
+   2 E        17.5 9am   E
+   3 N        15.4 9am   N
+   4 WNW      13.5 9am   W
+   5 SSE      11.1 9am   S
+   # … with 695 more rows
+   ```
+
+
+
+
+6. Finally, use `weather_wind` to produce a boxplot of `Temp` against
+   `WindMainDir`, facetted by `Hour`.
+   To do this, use `weather_wind` and:
+     - `ggplot` to initialize the plot,
+     - `geom_boxplot()` to get the boxplot,
+     - `facet_grid()` for the facetting,
+     - `labs()` to set the
+       - title as `"Temperature is higher in the afternoon"`,
+       - subtitle as
+
+        ```
+        str_wrap("In the morning, it decreases when
+                 the winds turns from East to West", width = 70)
+        ```
+
+       - x-axis as `"Wind direction"`,
+       - y-axis as `"Temperature (degree C)"`,
+     - `theme` to set the `legend.position` as `"bottom"`.
+   Store the plot into a `ggplot` object `wind_boxplot`.
+
+
+
+
+
+

@@ -1,0 +1,356 @@
+HW7: relational3
+
+In this exercise, we'll look at data about a university.
+This dataset contains four tables:
+  - `department_info.csv` contains information about the university's departments,
+    including `Department_ID`, `Department_Name` and `DOE` (date of
+    establishment).
+  - `employee_info.csv` contains information about the faculty, including
+    `Employee_ID`, `DOB` (date of birth), `DOJ` (date of university joining)
+    and the `Department_ID` to which the person belongs.
+  - `student_counselling_info.csv` contains information about students' admission,
+    including `Student_ID`, `DOA` (date of admission), `DOB`,
+    `Department_Choices` (choices student made during counselling) and
+    `Department_Admission` (department offered to student).
+  - `student_performance_info.csv` contains information about students' performances,
+    including `Student_ID`, `Semester_Name`, `Paper_ID`, `Paper_Name` and
+    `Marks` (marks scored in examination).
+After preprocessing each table, we will focus on the Engineering School.
+
+In the whole exercise, do NOT use a `for`, `while`, or `repeat` loop!
+
+1. Load the `tidyverse` and `lubridates` packages and use
+   `theme_set(theme_light())` to set the theme for the rest of the exercise.
+   Then, use `read_csv` to load
+     - `/course/data/department_info.csv` and assign it to a tibble `booking`,
+     - `/course/data/employee_info.csv` and assign it to a tibble `guest`,
+     - `/course/data/student_counselling_info.csv` and assign it to a tibble
+       `s_admission`,
+     - `/course/data/student_performance_info.csv` and assign it to a tibble
+       `s_performance`.
+
+   To check your answer:
+
+   The output of `print(department, n = 5)` is
+
+   ```
+   # A tibble: 40 x 3
+     Department_ID Department_Name                DOE
+     <chr>         <chr>                          <dttm>
+   1 IDEPT4670     Aerospace Engineering          1961-05-31 00:00:00
+   2 IDEPT5528     Biosciences and Bioengineering 1943-06-28 00:00:00
+   3 IDEPT3115     Chemical Engineering           1940-05-01 00:00:00
+   4 IDEPT5881     Chemistry                      2013-06-08 00:00:00
+   5 IDEPT4938     Civil Engineering              1941-10-27 00:00:00
+   # … with 35 more rows
+   ```
+
+   The output of `print(employee, n = 5)` is
+
+   ```
+   # A tibble: 1,000 x 4
+     Employee_ID DOB                 DOJ                 Department_ID
+     <chr>       <dttm>              <dttm>              <chr>
+   1 IU196557    1983-02-23 00:00:00 2009-10-31 00:00:00 IDEPT4938
+   2 IU449901    1985-09-02 00:00:00 2009-06-07 00:00:00 IDEPT2357
+   3 IU206427    1971-07-30 00:00:00 2008-05-09 00:00:00 IDEPT4670
+   4 IU688905    1973-07-20 00:00:00 2002-01-17 00:00:00 IDEPT2601
+   5 IU634582    1991-11-16 00:00:00 2000-02-13 00:00:00 IDEPT7626
+   # … with 995 more rows
+   ```
+
+   The output of `print(s_admission, n = 5)` is
+
+   ```
+   # A tibble: 4,000 x 5
+     Student_ID DOA                 DOB                 Department_Choi…
+     <chr>      <dttm>              <dttm>              <chr>
+   1 SID201311… 2013-07-01 00:00:00 1996-02-05 00:00:00 IDEPT7783
+   2 SID201311… 2013-07-01 00:00:00 1995-07-31 00:00:00 IDEPT6347
+   3 SID201311… 2013-07-01 00:00:00 1995-09-05 00:00:00 IDEPT1836
+   4 SID201311… 2013-07-01 00:00:00 1996-01-12 00:00:00 IDEPT8473
+   5 SID201311… 2013-07-01 00:00:00 1995-07-30 00:00:00 IDEPT5528
+   # … with 3,995 more rows, and 1 more variable:
+   #   Department_Admission <chr>
+   ```
+
+   The output of `print(s_performance, n = 5)` is
+
+   ```
+   # A tibble: 209,611 x 5
+     Student_ID  Semster_Name Paper_ID    Paper_Name Marks
+     <chr>       <chr>        <chr>       <chr>      <dbl>
+   1 SID20131143 Sem_1        SEMI0012995 Paper 1       44
+   2 SID20131143 Sem_1        SEMI0015183 Paper 2       74
+   3 SID20131143 Sem_1        SEMI0018371 Paper 3       80
+   4 SID20131143 Sem_1        SEMI0015910 Paper 4       44
+   5 SID20131143 Sem_1        SEMI0016208 Paper 5       95
+   # … with 2.096e+05 more rows
+   ```
+
+
+
+
+
+2. From `employee`, extract a tibble `employee_new` with columns
+   `Employee_ID`, `Department_ID`, `age`, `seniority` and `seniority_level`,
+   where
+     - `age` is the age of the professor (in years),
+     - `seniority` is the year of number of years since joining,
+     - and `seniority_level` is a factor with two levels, namely `"junior"`
+       (`seniority` <= 10) and `"senior`" (`seniority` > 10).
+   To do this, you can use `mutate()` to create the columns
+     - `age` and `seniority` from `DOB` and `DOJ` repectively by
+       - creating an interval with `%--%`, `today()` and `dyears()`.
+       - flooring the years to integers with `floor()`.
+     - `seniority_level` to categorize `seniority` by
+       - cutting `seniority` with `cut()`, setting
+         `breaks = min(seniority), 10, max(seniority)`,
+         `labels = c("junior", "senior")`, and `include.lowest = TRUE`,
+   Then, you can use `dplyr::select()` to select the desired columns.
+
+   To check your answer:
+
+   The output of `print(employee_new, n = 5)` is
+
+   ```
+   # A tibble: 1,000 x 5
+     Employee_ID Department_ID   age seniority seniority_level
+     <chr>       <chr>         <dbl>     <dbl> <fct>
+   1 IU196557    IDEPT4938        37        10 junior
+   2 IU449901    IDEPT2357        34        10 junior
+   3 IU206427    IDEPT4670        48        11 senior
+   4 IU688905    IDEPT2601        46        18 senior
+   5 IU634582    IDEPT7626        28        20 senior
+   # … with 995 more rows
+   ```
+
+
+
+
+
+3. From `s_admission`, extract a tibble `s_admission_new` with columns
+   `Student_ID`, `Department_Admission`, `age` and `school_year`, where
+     - `age` is the age of the student,
+     - `school_year` is the class standing, a factor with four levels, namely
+       `"graduate"`, `"senior"`, `"junior"`, `"sophomore"` or `"freshman"`.
+   To do this, you can use `mutate()` to create the columns `age` from
+   `DOB` similarly as above, and `school_year` by
+     - transforming `DOA` into a factor with `factor()`.
+     - collapsing the levels `"2013-07-01"` and `"2014-07-01"` into
+       `"graduate"` with `fct_collapse()`,
+     - recoding the other levels with `fct_recode()` to make
+       - `"2015-07-01"` into `"senior"`,
+       - `"2016-07-01"` into `"junior"`,
+       - `"2017-07-01"` into `"sophomore"`,
+       - `"2018-07-01"` into `"freshman"`,
+   Then, you can use `dplyr::select()` to select the desired columns.
+
+   To check your answer:
+
+   The output of `print(s_admission_new, n = 5)` is
+
+   ```
+   # A tibble: 4,000 x 4
+     Student_ID  Department_Admission   age school_year
+     <chr>       <chr>                <dbl> <fct>
+   1 SID20131143 IDEPT7783               24 graduate
+   2 SID20131151 IDEPT6347               24 graduate
+   3 SID20131171 IDEPT1836               24 graduate
+   4 SID20131176 IDEPT8473               24 graduate
+   5 SID20131177 IDEPT5528               24 graduate
+   # … with 3,995 more rows
+   ```
+
+   The output of `print(tail(s_admission_new), n = 5)` is
+
+   ```
+   # A tibble: 6 x 4
+     Student_ID  Department_Admission   age school_year
+     <chr>       <chr>                <dbl> <fct>
+   1 SID20189917 IDEPT6347               19 freshman
+   2 SID20189921 IDEPT7005               18 freshman
+   3 SID20189926 IDEPT1836               19 freshman
+   4 SID20189949 IDEPT4938               18 freshman
+   5 SID20189982 IDEPT6347               19 freshman
+   # … with 1 more row
+   ```
+
+
+
+
+
+4. From `s_performance`, extract a tibble `s_performance_new` with columns
+   `Student_ID`, `mean_score`, `min_score` and `max_score`. `mean_score`,
+   `min_score` and `max_score` are aggregated across semesters and papers.
+   To do this, you can use:
+      - `group_by()` to group the data by `Student_ID`.
+      - `summarize()` to calculate the mean, minimum and maximum of `Marks`.
+
+   To check your answer:
+
+   The output of `print(s_performance_new, n = 5)` is
+
+   ```
+   # A tibble: 3,819 x 4
+     Student_ID  mean_score min_score max_score
+     <chr>            <dbl>     <dbl>     <dbl>
+   1 SID20131143       71.7        22       100
+   2 SID20131151       72.6        40       100
+   3 SID20131171       70.9        20        99
+   4 SID20131176       70.9        42       100
+   5 SID20131177       70.3        29       100
+   # … with 3,814 more rows
+   ```
+
+
+
+
+
+5. From `department`, extract a tibble `department_engie` with columns
+   `Department_ID` and `Department_Name`, and the rows are those where
+   `Department_Name` has a match with the string `"Engineering"` (case insensitive).
+   To do this, you can use:
+     - `filter()` to filter `Department_Name` for the Engineering School
+       with `str_detect()` to match the string `"Engineering"`, either with
+       a regexp and the alternation `"|"`, or with `fixed()` and the
+       `ignore_case` argument,
+     - `dplyr::select()` to select the desired columns.
+
+   To check your answer:
+
+   The output of `print(department_engie, n = 5)` is
+
+   ```
+   # A tibble: 17 x 2
+     Department_ID Department_Name
+     <chr>         <chr>
+   1 IDEPT4670     Aerospace Engineering
+   2 IDEPT5528     Biosciences and Bioengineering
+   3 IDEPT3115     Chemical Engineering
+   4 IDEPT4938     Civil Engineering
+   5 IDEPT1423     Computer Science & Engineering
+   # … with 12 more rows
+   ```
+
+
+
+
+
+6. From `employee_new`, extract a tibble `employee_engie` by inner-joining
+   `department_engie` and transforming `Department_Name` into a factor with
+   levels ordered by frequency.
+   Hint: you can use `fct_infreq()`.
+   Note that the inner-join is used because there is no employee record
+   for three engineering departments. Hence, another join would create NAs.
+
+   To check your answer:
+
+   The output of `print(employee_engie, n = 5)` is
+
+   ```
+   # A tibble: 422 x 6
+     Employee_ID Department_ID   age seniority seniority_level
+     <chr>       <chr>         <dbl>     <dbl> <fct>
+   1 IU196557    IDEPT4938        37        10 junior
+   2 IU449901    IDEPT2357        34        10 junior
+   3 IU206427    IDEPT4670        48        11 senior
+   4 IU572796    IDEPT1142        42        12 senior
+   5 IU393717    IDEPT1825        47        10 junior
+   # … with 417 more rows, and 1 more variable: Department_Name <fct>
+   ```
+
+   The output of `print(employee_engie$Department_Name[1:2], max.levels = 2)` is
+
+   ```
+   [1] Civil Engineering              Energy Science and Engineering
+   14 Levels: Aerospace Engineering ... Centre of Studies in Resources Engineering (CSRE)
+   ```
+
+
+
+
+
+7. One important aspect of faculty make-up is seniority.
+   Draw horizontal stacked bar charts for `Department_Name` to visualize the
+   distribution of `seniority_level` for each department of the Engineering
+   school
+   To do this, use `employee_engie` and:
+     - `ggplot` to initialize the plot,
+     - `geom_bar()` to get the barplot,
+     - `coord_flip()` to flip the axes,
+     - `labs()` to set the
+       - title as
+
+        ```
+        str_wrap("Most departments have more senior professors
+                 than juniors", width = 40)
+        ```
+
+       - subtitle as `"Exceptions are CASDE and Chemical Engineering"`,
+       - x-axis as `"Department's name"`,
+       - y-axis as `"Number of professors"`,
+       - fill as `"Seniority level"`.
+   Store the plot into a `ggplot` object `g1`.
+
+
+
+
+
+8. Inner-join the tibbles `s_admission_new`, `s_performance_new` and
+   `department_engie` to create a new tibble `student_engie`, with
+   the `school_year` column transformed into a factor with levels ordered
+   by median `mean_score`.
+   To do this, you can use:
+     - `inner_join()` with the key `"Student_ID"` to join
+       `s_admission_new` with `s_performance_new`.
+     - `inner_join()` with the key `"Department_Admission"` in the left table
+       and `"Department_ID"` in the right table to further join
+       `department_engie`,
+     - `mutate()` and `fct_reorder()` to transform and reorder `school_year`
+       appropriately.
+
+   To check your answer:
+
+   The output of `print(student_engie, n = 5)` is
+
+   ```
+   # A tibble: 1,740 x 8
+     Student_ID Department_Admi…   age school_year mean_score min_score
+     <chr>      <chr>            <dbl> <fct>            <dbl>     <dbl>
+   1 SID201311… IDEPT7783           24 graduate          71.7        22
+   2 SID201311… IDEPT8473           24 graduate          70.9        42
+   3 SID201311… IDEPT5528           24 graduate          70.3        29
+   4 SID201311… IDEPT8473           24 graduate          64.3        40
+   5 SID201311… IDEPT3115           24 graduate          69.8        21
+   # … with 1,735 more rows, and 2 more variables: max_score <dbl>,
+   #   Department_Name <chr>
+   ```
+
+   The output of `print(student_engie$school_year[1:2], max.levels = 2)` is
+
+   ```
+   [1] graduate graduate
+   5 Levels: senior ... graduate
+   ```
+
+
+
+
+
+9. Using `student_engie`, let's draw an horizontal boxplots for
+   `mean_score` against `school_year`.
+   To do this, use `student_engie` and:
+     - `ggplot` to initialize the plot,
+     - `geom_boxplot()` to get the barplot,
+     - `coord_flip()` to flip the axes,
+     - `labs()` to set the
+       - title as `"Score distribution is similar across years"`,
+       - x-axis as `"Class standing"`,
+       - y-axis as `"Mean paper score"`.
+   Store the plot into a `ggplot` object `g2`.
+
+
+
+
+

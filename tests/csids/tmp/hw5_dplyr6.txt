@@ -1,0 +1,183 @@
+HW5: dplyr6
+
+Do NOT use a `for`, `while`, or `repeat` loop!
+Whenever using `select()`, make sure to write `dplyr::select()` to avoid
+conflicts with other packages.
+
+1. Load the `tidyverse` package and use `read_csv` to load
+   `/course/data/airbnb.csv` and assign it to a tibble `airbnb`.
+
+   To check your answer:
+
+   The output of `print(airbnb, n = 5)` is
+
+   ```
+   # A tibble: 48,895 x 16
+        id name  host_id host_name neighbourhood_g… neighbourhood
+     <dbl> <chr>   <dbl> <chr>     <chr>            <chr>
+   1  2539 Clea…    2787 John      Brooklyn         Kensington
+   2  2595 Skyl…    2845 Jennifer  Manhattan        Midtown
+   3  3647 THE …    4632 Elisabeth Manhattan        Harlem
+   4  3831 Cozy…    4869 LisaRoxa… Brooklyn         Clinton Hill
+   5  5022 Enti…    7192 Laura     Manhattan        East Harlem
+   # … with 48,890 more rows, and 10 more variables: latitude <dbl>,
+   #   longitude <dbl>, room_type <chr>, price <dbl>,
+   #   minimum_nights <dbl>, number_of_reviews <dbl>,
+   #   last_review <date>, reviews_per_month <dbl>,
+   #   calculated_host_listings_count <dbl>, availability_365 <dbl>
+   ```
+
+
+
+
+
+2. We want to find the most expensive neighbourhood of NYC, so we need a
+   tibble containing the following information:
+     - `neighbourhood`, the name of the neighbourhood,
+     - `avg_price`, the average price of the apartments in that
+       neighbourhood,
+     - `price_rank`, the quantile of the average price of that neighbourhood,
+       among all neighbourhoods. E.g., if a neighbourhood is the second most
+       expensive of 5 neighbourhoods, its percent rank will be 0.75.
+   To do that, you can use
+       - `drop_na()` to remove the NAs,
+       - `group_by()` to group the apts by neighourhood,
+       - `summarize()` to calculate the average price of each neighbourhood,
+       - `mutate()` and `percent_rank()` to calculate the quantile of
+         each neighbourhood saved in column `price_rank`.
+   Save the result into `nyc_price`.
+
+   To check your answer:
+
+   The output of `print(nyc_price, n = 5)` is
+
+   ```
+   # A tibble: 218 x 3
+     neighbourhood avg_price price_rank
+     <chr>             <dbl>      <dbl>
+   1 Allerton           90.6     0.438
+   2 Arden Heights      67.2     0.0968
+   3 Arrochar          118.      0.659
+   4 Arverne           159.      0.802
+   5 Astoria           116.      0.645
+   # … with 213 more rows
+   ```
+
+
+
+
+
+3. Using `nyc_price`, find the top 10% most expensive neighbourhoods and
+   report them in alphabetical order.
+   Save the result tibble to `nyc_10percent`.
+   To do that, you can use
+        - `filter()` function to filter the `price_rank`,
+        - `arrange()` to reorder the neighbourhoods.
+
+   To check your answer:
+
+   The output of `print(nyc_10percent, n = 5)` is
+
+   ```
+   # A tibble: 22 x 3
+     neighbourhood      avg_price price_rank
+     <chr>                  <dbl>      <dbl>
+   1 Breezy Point            195       0.917
+   2 Brooklyn Heights        202.      0.922
+   3 Chelsea                 222.      0.940
+   4 Cobble Hill             193.      0.912
+   5 Financial District      219.      0.935
+   # … with 17 more rows
+   ```
+
+
+
+
+
+4. Calculate the median price and median availability days of each room type
+   and save the result into `by_type`.
+   To do that, you can use
+      - `group_by()` to group the apartments by room type,
+      - `select()` to select columns `price` and `availability_365`,
+      - `summarize_if()` and `is.numeric` to calculate the median of each
+        group (pay attention to NAs).
+
+   To check your answer:
+
+   The output of `print(by_type, n = 1)` is
+
+   ```
+   # A tibble: 3 x 3
+     room_type       price availability_365
+     <chr>           <dbl>            <dbl>
+   1 Entire home/apt   160               42
+   # … with 2 more rows
+   ```
+
+
+
+
+
+5. To know the per room types count and proportions in different
+   neighbourhood, we need a tibble containing the following information:
+     - `neighbourhood`, as before,
+     - `room_type`, the type of room,
+     - `count`, the total number observations per room type/neighbourhood,
+     - `prop`, the corresponding proportion of each room type among all
+       the rooms in that neighbourhood.
+   Save the result tibble into `neighbourhood_room`.
+   To do that, you can use
+      - `group_by()` to group the apartments,
+      - `count()` to count the number of apartments in each group,
+      - `sum()` to sum the number of apartments in each group,
+      - `mutate()` to calculate the proportion and add new columnn `prop`.
+
+   To check your answer:
+
+   The output of `print(neighbourhood_room, n = 5)` is
+
+   ```
+   # A tibble: 15 x 4
+   # Groups:   neighbourhood_group [5]
+     neighbourhood_group room_type       count   prop
+     <chr>               <chr>           <int>  <dbl>
+   1 Bronx               Entire home/apt   379 0.347
+   2 Bronx               Private room      652 0.598
+   3 Bronx               Shared room        60 0.0550
+   4 Brooklyn            Entire home/apt  9559 0.475
+   5 Brooklyn            Private room    10132 0.504
+   # … with 10 more rows
+   ```
+
+
+
+
+
+6. We want to convert `neighbourhood_group` into a new tibble
+  `neighbourhood_room_wider` that is nicer for reporting,
+   that is showing in three separate columns the proportion of each room
+   type within each neighbourhood.
+   To do that, you can use
+      - `select()` to remove the `count` column,
+      - `pivot_wider()` to make the tibble wider.
+
+   To check your answer:
+
+   The output of `print(neighbourhood_room_wider, n = 5)` is
+
+   ```
+   # A tibble: 5 x 4
+   # Groups:   neighbourhood_group [5]
+     neighbourhood_group  Entire home/apt   Private room   Shared room
+     <chr>                           <dbl>          <dbl>         <dbl>
+   1 Bronx                           0.347          0.598        0.0550
+   2 Brooklyn                        0.475          0.504        0.0205
+   3 Manhattan                       0.609          0.368        0.0222
+   4 Queens                          0.370          0.595        0.0349
+   5 Staten Island                   0.472          0.504        0.0241
+   ```
+
+
+
+
+

@@ -1,0 +1,285 @@
+HW7: relational4
+
+In the whole exercise, do NOT use a `for`, `while`, or `repeat` loop!
+
+1. Load the `tidyverse` and `lubridates` packages and use
+   `theme_set(theme_light())` to set the theme for the rest of the exercise.
+   Then, use `read_csv` to load
+     - `/course/data/movies.csv` and assign it to a tibble `movie`,
+     - `/course/data/ratings.csv` and assign it to a tibble `ratings`, with an
+       additional`date` column created from `timestamp` using `mutate()` and
+       `as_datetime()`.
+
+   To check your answer:
+
+   The output of `print(movies, n = 5)` is
+
+   ```
+   # A tibble: 27,254 x 3
+     movieId title                       genres
+       <dbl> <chr>                       <chr>
+   1       1 Toy Story (1995)            Adventure|Animation|Children|Co…
+   2       2 Jumanji (1995)              Adventure|Children|Fantasy
+   3       3 Grumpier Old Men (1995)     Comedy|Romance
+   4       4 Waiting to Exhale (1995)    Comedy|Drama|Romance
+   5       5 Father of the Bride Part I… Comedy
+   # … with 2.725e+04 more rows
+   ```
+
+   The output of `print(ratings, n = 5)` is
+
+   ```
+   # A tibble: 50,000 x 5
+     userId movieId rating  timestamp date
+      <dbl>   <dbl>  <dbl>      <dbl> <dttm>
+   1  36660     280    4    834049053 1996-06-06 08:17:33
+   2  91867    2657    5    971578971 2000-10-15 03:02:51
+   3 107259    2566    2    944169497 1999-12-02 21:18:17
+   4 129338    4161    2.5 1137405482 2006-01-16 09:58:02
+   5 128693    2355    4    984620012 2001-03-15 01:33:32
+   # … with 5e+04 more rows
+   ```
+
+
+
+
+
+2. From `ratings`, extract a new tibble `ratings_per_year` by adding a new
+   column `year`, corresponding to the year of the observation, and then
+   calculating, for each `year`:
+     - `mean`, i.e. the mean rating,
+     - `n`, the number of ratings,
+     - `sd`, the standard deviation of the ratings,
+     - `se`,  the standard error of the number of ratings, computed as
+       `1.96 * sd / sqrt(n)`.
+
+   To check your answer:
+
+   The output of `print(ratings_per_year, n = 5)` is
+
+   ```
+   # A tibble: 20 x 5
+      year  mean     n    sd     se
+     <dbl> <dbl> <int> <dbl>  <dbl>
+   1  1996  3.56  4089 0.985 0.0302
+   2  1997  3.56  1750 1.01  0.0474
+   3  1998  3.49   753 1.17  0.0833
+   4  1999  3.59  2950 1.13  0.0408
+   5  2000  3.59  4894 1.12  0.0313
+   # … with 15 more rows
+   ```
+
+
+
+
+
+3. Using `ratings_per_year`, draw a scatterplot of the `mean` against `year`,
+   with error bars computed with `mean - se` and `mean + se`.
+   To do this, use `ratings_per_year` and:
+     - `ggplot` to initialize the plot,
+     - `geom_point()` to get the scatterplot,
+     - `geom_errorbar()` to add the error bars,
+     - `labs()` to set the
+       - title as `"2004 and 2005 have the lowest average ratings"`,
+       - subtitle as `"2014 has the highest average ratings"`,
+       - x-axis as `"Year"`,
+       - y-axis as `"Average rating (with standard errors)"`.
+   Store the plot into a `ggplot` object `g1`.
+
+
+
+
+
+4. From `movies`, extract a new tibble `movies_new` by
+     - adding a new variable `year`, corresponding to an extraction of the
+       year from the `title` column and its convertion into a numeric,
+       which you can do using `mutate()`, `str_sub()` and `as.numeric()`,
+     - use `separate_rows()` to separate the `genres` column into multiple
+       rows (pay attention to the `sep` argument).
+
+   Note that the `title` column format is relatively clean here. What if
+   we have 4-digit years and 2-digit years mix
+   (e.g. 1995, 96, 02, 2005, etc.)?
+   The method with `str_sub()` wouldn't work, as one couldn't use a fixed
+   `start` and `end`. What could we do in this case?
+   Method 1: locate the indices of `(` and `)` for each title and then use
+   `str_sub()`.
+   Method 2: use regular expression to do that in one step.
+   For instance, you can combine `str_replace()` with
+   `pattern = ".+\\(([0-9]+)\\)"`, `replacement = "\\1"` in order to
+   extract the year.
+   Here, `str_replace()` matches to argument pattern within each element of
+   a character vector, and then replace the designed pattern.
+   The pattern is `".+\\(([0-9]+)\\)"`, where
+     - `.` means the string starts with a character and `.+` means there are
+       one or more characters,
+     - `\\(` and `\\)` means there really exist parenthese with `\\` being
+       the syntax for escaping,
+     - `([0-9]+)` means there exists a string of characters that can be
+       converted to numeric.
+   The replacement is `\\1`, where `\\1` means that we only keep the
+   characters that can be converted into numeric.
+   If interested, please go to the following website for more details:
+   https://stringr.tidyverse.org/articles/regular-expressions.html.
+
+   To check your answer:
+
+   The output of `print(movies_new, n = 5)` is
+
+   ```
+   # A tibble: 54,374 x 4
+     movieId title            genres     year
+       <dbl> <chr>            <chr>     <dbl>
+   1       1 Toy Story (1995) Adventure  1995
+   2       1 Toy Story (1995) Animation  1995
+   3       1 Toy Story (1995) Children   1995
+   4       1 Toy Story (1995) Comedy     1995
+   5       1 Toy Story (1995) Fantasy    1995
+   # … with 5.437e+04 more rows
+   ```
+
+
+
+
+
+5. From `movies_new`, extract a tibble `ratings_of_movies` by
+     - inner-joining `ratings`,
+     - removing the `movieId`, `userId` and `timestamp` columns after the
+       join,
+     - filtering-out the rows such that the `genres` is
+       `"(no genres listed)"`.
+   To do this, you can use `inner_join()`, `dplyr::select`, and `filter()`.
+
+   To check your answer:
+
+   The output of `print(ratings_of_movies, n = 5)` is
+
+   ```
+   # A tibble: 132,724 x 5
+     title            genres     year rating date
+     <chr>            <chr>     <dbl>  <dbl> <dttm>
+   1 Toy Story (1995) Adventure  1995    3.5 2005-03-17 20:22:12
+   2 Toy Story (1995) Adventure  1995    3   1999-07-06 18:41:32
+   3 Toy Story (1995) Adventure  1995    3   2009-08-18 18:31:29
+   4 Toy Story (1995) Adventure  1995    4.5 2009-08-20 06:36:02
+   5 Toy Story (1995) Adventure  1995    5   1997-01-26 14:23:23
+   # … with 1.327e+05 more rows
+   ```
+
+
+
+
+
+6. From `ratings_of_movies`, extract a tibble `ratings_by_genres` by
+   computing `average_rating` and `number_of_ratings`, respectively
+   the average rating and number of ratings per genre.
+   To do this, you can use `group_by()`, `summarize()`.
+
+   To check your answer:
+
+   The output of `print(ratings_by_genres, n = 5)` is
+
+   ```
+   # A tibble: 19 x 3
+     genres    average_rating number_of_ratings
+     <chr>              <dbl>             <int>
+   1 Action              3.43             13970
+   2 Adventure           3.49             10875
+   3 Animation           3.59              2807
+   4 Children            3.38              4133
+   5 Comedy              3.42             18701
+   # … with 14 more rows
+   ```
+
+
+
+
+
+7. Draw a smooth regression line (computed using the `"gam"` method) of
+   `average_rating` against `number_of_ratings`, and add a scatterplot of
+   the same data albeit colored by `genres`.
+   To do this, use `ratings_by_genres` and:
+     - `ggplot` to initialize the plot,
+     - `geom_smooth()` to get the smooth regression line with `method` set to
+       `"gam"`, and `color` set to `"black"`,
+     - `geom_point()` to get the scatterplot,
+     - `scale_x_log10()` to set the x-axis as logarithmic,
+     - `labs()` to set the
+       - title as
+
+         ```
+         str_wrap("When the number of ratings is over 5000,
+                  its average plateaus around 3.5")
+         ```
+
+       - x-axis as `"Number of ratings"`,
+       - y-axis as `"Average rating"`,
+     - `theme` to set the `legend.position` as `"bottom"`.
+   Store the plot into a `ggplot` object `g2`.
+
+
+
+
+
+8. From `ratings_of_movies`, extract a tibble `ratings_over_time` by
+   creating three columns:
+     - `interval`, a column with class `"interval"` defined as the inteval
+       of time between the rating and the film's release (you can assume
+       that the movie was released on January 1st of the year that you
+       extracted before),
+     - `years_passed`, the number of years in `interval` (i.e., obtained
+       simply by dividing by one duration year),
+     - `decade`, a factor with levels `(0,20]`, `(20,40]`, ..., `(100,120]`.
+   Then, reorder the columns as shown below, and filter-out the observations
+   such that `years_passed` is smaller than or equal to 80, and.
+   Hints:
+     - you can use `mutate()`, `dplyr::select`, and `filter`,
+     - to create `interval`, you can use `make_datetime()` to convert
+       the release year into a date and remembers that dates/datetimes can
+       be substracted to create intervals,
+     - to create `years_passed`, remember that intervals can be divided by
+       durations, so `dyears()` can help to compute the number of years that
+       have passedm
+     - to create `decade`, remember the `cut()` function.
+
+   To check your answer:
+
+   The output of `print(ratings_over_time, n = 5)` is
+
+   ```
+   # A tibble: 132,595 x 8
+     genres interval years_passed decade title  year rating
+     <chr>  <drtn>          <dbl> <fct>  <chr> <dbl>  <dbl>
+   1 Adven… 3728.84…        10.2  (0,20] Toy …  1995    3.5
+   2 Adven… 1647.77…         4.51 (0,20] Toy …  1995    3
+   3 Adven… 5343.77…        14.6  (0,20] Toy …  1995    3
+   4 Adven… 5345.27…        14.6  (0,20] Toy …  1995    4.5
+   5 Adven…  756.59…         2.07 (0,20] Toy …  1995    5
+   # … with 1.326e+05 more rows, and 1 more variable: date <dttm>
+   ```
+
+
+
+
+
+9. Draw an horizontal linerange plot of `rating` against `genre`,
+   colored by `decade`.
+   To do this, use `ratings_over_time` and:
+     - `ggplot` to initialize the plot,
+     - `geom_linerange()` to get the linerange plot, and set the `stat`
+       as `"summary"`,
+     - `coord_flip()` to flip the axes,
+     - `labs()` to set the
+       - title as `"The average rating usually increases with time"`,
+       - subtitle as `"Exceptions are documentaries and animation movies"`,
+       - x-axis as `"Genre"`,
+       - y-axis as `"Average rating (and standard errors)"`,
+       - color as `"Years between release and rating"`,
+     - `theme` to set the `legend.position` as `"bottom"`.
+   Store the plot into a `ggplot` object `g3`.
+
+
+
+
+
+

@@ -1,0 +1,246 @@
+HW5: dplyr4
+
+Do NOT use a `for`, `while`, or `repeat` loop!
+Whenever using `select()`, make sure to write `dplyr::select()` to avoid
+conflicts with other packages.
+
+1. Load the `tidyverse` package as well as the `billboard` dataset.
+
+   To check your answer:
+
+   The output of `print(billboard, n = 5)` is
+
+   ```
+   # A tibble: 317 x 79
+     artist track date.entered   wk1   wk2   wk3   wk4   wk5   wk6   wk7
+     <chr>  <chr> <date>       <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+   1 2 Pac  Baby… 2000-02-26      87    82    72    77    87    94    99
+   2 2Ge+h… The … 2000-09-02      91    87    92    NA    NA    NA    NA
+   3 3 Doo… Kryp… 2000-04-08      81    70    68    67    66    57    54
+   4 3 Doo… Loser 2000-10-21      76    76    72    69    67    65    55
+   5 504 B… Wobb… 2000-04-15      57    34    25    17    17    31    36
+   # … with 312 more rows, and 69 more variables: wk8 <dbl>, wk9 <dbl>,
+   #   wk10 <dbl>, wk11 <dbl>, wk12 <dbl>, wk13 <dbl>, wk14 <dbl>,
+   #   wk15 <dbl>, wk16 <dbl>, wk17 <dbl>, wk18 <dbl>, wk19 <dbl>,
+   #   wk20 <dbl>, wk21 <dbl>, wk22 <dbl>, wk23 <dbl>, wk24 <dbl>,
+   #   wk25 <dbl>, wk26 <dbl>, wk27 <dbl>, wk28 <dbl>, wk29 <dbl>,
+   #   wk30 <dbl>, wk31 <dbl>, wk32 <dbl>, wk33 <dbl>, wk34 <dbl>,
+   #   wk35 <dbl>, wk36 <dbl>, wk37 <dbl>, wk38 <dbl>, wk39 <dbl>,
+   #   wk40 <dbl>, wk41 <dbl>, wk42 <dbl>, wk43 <dbl>, wk44 <dbl>,
+   #   wk45 <dbl>, wk46 <dbl>, wk47 <dbl>, wk48 <dbl>, wk49 <dbl>,
+   #   wk50 <dbl>, wk51 <dbl>, wk52 <dbl>, wk53 <dbl>, wk54 <dbl>,
+   #   wk55 <dbl>, wk56 <dbl>, wk57 <dbl>, wk58 <dbl>, wk59 <dbl>,
+   #   wk60 <dbl>, wk61 <dbl>, wk62 <dbl>, wk63 <dbl>, wk64 <dbl>,
+   #   wk65 <dbl>, wk66 <lgl>, wk67 <lgl>, wk68 <lgl>, wk69 <lgl>,
+   #   wk70 <lgl>, wk71 <lgl>, wk72 <lgl>, wk73 <lgl>, wk74 <lgl>,
+   #   wk75 <lgl>, wk76 <lgl>
+   ```
+
+
+
+
+
+2. Let's take a look at the `billboard` data: notice that there are 79
+   columns in total, with 76 columns representing the rankings of each week.
+   Put the week name into one column called `week` and store the ranking
+   into another column called `rank`, keep the first three column names,
+   save the new tibble into `t1`, which will have 24,092 rows and 5 columns.
+   To do that, you can use `pivot_longer` and `starts_with`.
+   Hint: pay attention to the `cols`, `names_to` and `values_to` arguments.
+
+   To check your answer:
+
+   The output of `print(t1, n = 5)` is
+
+   ```
+   # A tibble: 24,092 x 5
+     artist track                   date.entered week   rank
+     <chr>  <chr>                   <date>       <chr> <dbl>
+   1 2 Pac  Baby Don't Cry (Keep... 2000-02-26   wk1      87
+   2 2 Pac  Baby Don't Cry (Keep... 2000-02-26   wk2      82
+   3 2 Pac  Baby Don't Cry (Keep... 2000-02-26   wk3      72
+   4 2 Pac  Baby Don't Cry (Keep... 2000-02-26   wk4      77
+   5 2 Pac  Baby Don't Cry (Keep... 2000-02-26   wk5      87
+   # … with 24,087 more rows
+   ```
+
+
+
+
+
+3. We can notice that, in `t1`,
+     - the rank includes a lot of `NA` values,
+     - the `wk` in front of each `week` is redundant.
+   So let's do the same as in the previous question, but this time
+   additionally dropping the `NA` values and changing `wk{number}` to
+   `{number}` for the `week` column as well.
+   Hint: to do so, you can start from `billboard` dataset and use
+   `pivot_longer` again, but further paying attention to the `names_prefix`
+   and `values_drop_na` arguments.
+   Save your result into `t2`.
+
+   To check your answer:
+
+   The output of `print(t2, n = 5)` is
+
+   ```
+   # A tibble: 5,307 x 5
+     artist track                   date.entered week   rank
+     <chr>  <chr>                   <date>       <chr> <dbl>
+   1 2 Pac  Baby Don't Cry (Keep... 2000-02-26   1        87
+   2 2 Pac  Baby Don't Cry (Keep... 2000-02-26   2        82
+   3 2 Pac  Baby Don't Cry (Keep... 2000-02-26   3        72
+   4 2 Pac  Baby Don't Cry (Keep... 2000-02-26   4        77
+   5 2 Pac  Baby Don't Cry (Keep... 2000-02-26   5        87
+   # … with 5,302 more rows
+   ```
+
+
+
+
+
+4. From `t2`, we now want to check the highest weekly rank increase.
+   For example, for the first track `Baby Don't Cry (Keep...`, its weekly
+   ranking is 87, 82, 72, 77, 87, 94, 99, so the highest rank increase will
+   be 82-72=10 from week 2 to week 3. For each track, compute its highest
+   rank increase, and save the answer in the column `highest_rank_increase`.
+   To do that, you can use
+     - `mutate` and `lag` to calculate the rank difference,
+     - `filter` to filter out the information for week 1 (because week 1 is
+       the first week for which the song has a rank thus there is no rank
+       increase),
+     - `group_by` to group the data by `artist`, `track`, and `date.entered`,
+     - `summarize` to find out the maximum of rank difference and call this
+       column `highest_rank_increase`,
+     - `arrange` to sort by descending `highest_rank_increase`.
+   Save your answer into `t2_rank`.
+
+   To check your answer:
+
+   The output of `print(t2_rank, n = 5)` is
+
+   ```
+   # A tibble: 313 x 4
+   # Groups:   artist, track [313]
+     artist         track                date.entered highest_rank_incre…
+     <chr>          <chr>                <date>                     <dbl>
+   1 Kenny G        Auld Lang Syne (The… 1999-12-25                    82
+   2 Martin, Ricky  Shake Your Bon-Bon   1999-11-20                    63
+   3 Sisqo          Incomplete           2000-06-24                    53
+   4 Houston, Whit… I Learned From The … 2000-02-19                    43
+   5 Destiny's Chi… Say My Name          1999-12-25                    39
+   # … with 308 more rows
+   ```
+
+
+
+
+
+5. Coming back to `t2`, we now want to have the `year`, `month` and `date`
+   information seperately. We can thus use `seperate` function to seperate
+   the `date.entered` into `year`, `month`, and `date`, e.g.
+   `2000-02-26` becomes `2000`, `02`, and `26`.
+   Save your result into `t3`.
+
+   To check your answer:
+
+   The output of `print(t3, n = 5)` is
+
+   ```
+   # A tibble: 5,307 x 7
+     artist track                   year  month date  week   rank
+     <chr>  <chr>                   <chr> <chr> <chr> <chr> <dbl>
+   1 2 Pac  Baby Don't Cry (Keep... 2000  02    26    1        87
+   2 2 Pac  Baby Don't Cry (Keep... 2000  02    26    2        82
+   3 2 Pac  Baby Don't Cry (Keep... 2000  02    26    3        72
+   4 2 Pac  Baby Don't Cry (Keep... 2000  02    26    4        77
+   5 2 Pac  Baby Don't Cry (Keep... 2000  02    26    5        87
+   # … with 5,302 more rows
+   ```
+
+
+
+
+
+6. Use `group_by` to group `t3` by `artist`, `track` and `month`.
+   Then, use `summarize` to add another column called `highest_rank`,
+   which represent the highest rank for each song and save your result into
+   `t4` which will have 317 rows and 4 columns.
+
+   To check your answer:
+
+   The output of `print(t4, n = 5)` is
+
+   ```
+   # A tibble: 317 x 4
+   # Groups:   artist, track [317]
+     artist       track                   month highest_rank
+     <chr>        <chr>                   <chr>        <dbl>
+   1 2 Pac        Baby Don't Cry (Keep... 02              72
+   2 2Ge+her      The Hardest Part Of ... 09              87
+   3 3 Doors Down Kryptonite              04               3
+   4 3 Doors Down Loser                   10              55
+   5 504 Boyz     Wobble Wobble           04              17
+   # … with 312 more rows
+   ```
+
+
+
+
+
+7. Let's go back to the original `billborad`. We now want to look at the
+   highest ranks of the songs in their first week of entering the top 100
+   and save the result into `t5`.
+   To do that, you can use
+     - `filter` to filter out the `NA` values in `wk1` if there's any,
+     - `arrange` to sort them by acending week 1 rank,
+     - `select` to include only the columns  `artist`, `track`,
+        `date.entered` and `wk1_rank`.
+
+   To check your answer:
+
+   The output of `print(t5, n = 5)` is
+
+   ```
+   # A tibble: 317 x 4
+     artist                         track           date.entered wk1_rank
+     <chr>                          <chr>           <date>          <dbl>
+   1 "Santana"                      Maria, Maria    2000-02-12         15
+   2 "Hanson"                       This Time Arou… 2000-04-22         22
+   3 "Pink"                         There U Go      2000-03-04         25
+   4 "Carey, Mariah"                Crybaby         2000-06-24         28
+   5 "Elliott, Missy \"Misdemeanor… Hot Boyz        1999-11-27         36
+   # … with 312 more rows
+   ```
+
+
+
+
+
+8. Now, let's use `t1` to compute the average rank per artist for the
+   songs released in 2000 and save your result into `t6`.
+   To do that, you can use
+     - `filter` and `startsWith` to filter out the songs released in 1999,
+     - `group_by` to group by artist,
+     - `summarize` to calculate the average rank of songs for each  artist.
+
+   To check your answer:
+
+   The output of `print(t6, n = 5)` is
+
+   ```
+   # A tibble: 204 x 2
+     artist       avg_rank
+     <chr>           <dbl>
+   1 2 Pac            85.4
+   2 2Ge+her          90
+   3 3 Doors Down     37.6
+   4 504 Boyz         56.2
+   5 98^0             37.6
+   # … with 199 more rows
+   ```
+
+
+
+
+

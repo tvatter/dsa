@@ -1,0 +1,143 @@
+HW5: tidyr2
+
+Do NOT use a `for`, `while`, or `repeat` loop!
+Whenever using `select()`, make sure to write `dplyr::select()` to avoid
+conflicts with other packages.
+
+1. Load the `tidyverse` package and use `read_csv` to load
+   `/course/data/activities.csv` and assign it to a tibble `activities`.
+   In this dataset, each record is an observation (keyed by `id` and `trt`,
+   i.e., treatment group) whose score has been recorded at two times (`T1`
+   and `T2`) for three actions (`work`, `play` and `talk`).
+
+   To check your answer:
+
+   The output of `print(activities, n = 5)` is
+
+   ```
+   # A tibble: 10 x 8
+        id trt   work.T1 play.T1 talk.T1 work.T2 play.T2 talk.T2
+     <dbl> <chr>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
+   1     1 cnt     0.652   0.865  0.536   0.275    0.354  0.0319
+   2     2 cnt     0.568   0.615  0.0931  0.229    0.936  0.114
+   3     3 tr      0.114   0.775  0.170   0.0144   0.246  0.469
+   4     4 tr      0.596   0.356  0.900   0.729    0.473  0.397
+   5     5 tr     NA       0.406  0.423   0.250    0.192  0.834
+   # … with 5 more rows
+   ```
+
+
+
+
+
+2. Recall the three rules for a tidy dataset. What is the issue here?
+   We have variables stored in multiple columns!
+   From the `activities` tibble, extract a tibble `act_longer` of
+   dimension 60 x 4 that contains the `id`, `trt`, `var` and `score` columns:
+   `var` is a new column that collects the six columns for `work`, `play` and
+   `talk`, while `score` is the corresponding score. The dataset should be
+   sorted by increasing `id` and `trt`.
+   To do this, you can use
+     - `pivot_longer()` to gather the six `work.T1` to `talk.T2`.
+
+   To check your answer:
+
+   The output of `print(act_longer, n = 5)` is
+
+   ```
+   # A tibble: 60 x 4
+        id trt   var     score
+     <dbl> <chr> <chr>   <dbl>
+   1     1 cnt   work.T1 0.652
+   2     1 cnt   play.T1 0.865
+   3     1 cnt   talk.T1 0.536
+   4     1 cnt   work.T2 0.275
+   5     1 cnt   play.T2 0.354
+   # … with 55 more rows
+   ```
+
+
+
+
+
+3. What is the issue now? Two variables are stored in a single column!
+   From `act_longer`, extract a tibble `act_separated` of dimension 60 x 5
+   that contains the `id`, `trt`, `action`, `time` and `score` columns.
+   `action` and `time` are two new columns that are separated from
+   `act_longer$var`.
+   To do this, you can use `separate()` to separate `var` in `act_longer`.
+
+   To check your answer:
+
+   The output of `print(act_separated, n = 5)` is
+
+   ```
+   # A tibble: 60 x 5
+        id trt   action time  score
+     <dbl> <chr> <chr>  <chr> <dbl>
+   1     1 cnt   work   T1    0.652
+   2     1 cnt   play   T1    0.865
+   3     1 cnt   talk   T1    0.536
+   4     1 cnt   work   T2    0.275
+   5     1 cnt   play   T2    0.354
+   # … with 55 more rows
+   ```
+
+
+
+
+
+4. Is this dataset finally tidy? Not quite, we still have observations
+   stored in multiple rows.
+   From `act_separated`, extract a tibble `act_wider` of dimension 20 x 6
+   that contains the `id`, `trt`, `time`, `play`, `talk` and `work` columns.
+   `play`, `talk` and `work` are three new columns that are spread from
+   `act_separated$action`.
+   To do this, you can use `pivot_wider()` to spread `action` in
+   `act_separated` over multiple columns.
+
+   To check your answer:
+
+   The output of `print(act_wider, n = 5)` is
+
+   ```
+   # A tibble: 20 x 6
+        id trt   time   work  play   talk
+     <dbl> <chr> <chr> <dbl> <dbl>  <dbl>
+   1     1 cnt   T1    0.652 0.865 0.536
+   2     1 cnt   T2    0.275 0.354 0.0319
+   3     2 cnt   T1    0.568 0.615 0.0931
+   4     2 cnt   T2    0.229 0.936 0.114
+   5     3 tr    T1    0.114 0.775 0.170
+   # … with 15 more rows
+   ```
+
+
+
+
+
+5. There is one missing value in `act_wider`. Use the function `is.na` and
+   `which()` to locate the column index of the missing value
+   (hint: `arr.ind = TRUE` might be useful). Store the result
+   into a new variable `col_ix`, which should just be an integer.
+
+
+
+
+6. Use the function `fill()` to backward fill the missing value in
+   `act_wider` (hint: in the `up` direction).
+   Use the `col_ix` you find in question 5.
+   Store the result into a tibble `act_filled`.
+
+   To check your answer:
+
+   The output of `print(sum(act_filled[, col_ix]), digits = 2)` is
+
+   ```
+   [1] 7.2
+   ```
+
+
+
+
+

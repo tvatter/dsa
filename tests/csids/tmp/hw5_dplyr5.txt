@@ -1,0 +1,169 @@
+HW5: dplyr5
+
+Do NOT use a `for`, `while`, or `repeat` loop!
+Whenever using `select()`, make sure to write `dplyr::select()` to avoid
+conflicts with other packages.
+
+1. Load the `tidyverse` package and use `read_csv` to load
+   `/course/data/citybike.csv` and assign it to a tibble `trips`.
+
+   To check your answer:
+
+   The output of `print(trips, n = 5)` is
+
+   ```
+   # A tibble: 100,000 x 15
+     tripduration starttime stoptime  start station …  start station …
+            <dbl> <chr>     <chr>               <dbl> <chr>
+   1         5945 8/5/2016… 8/5/201…              228 E 48 St & 3 Ave
+   2         1494 8/3/2016… 8/3/201…              460 S 4 St & Wythe …
+   3          826 8/30/201… 8/30/20…             3301 Columbus Ave & …
+   4          278 8/15/201… 8/15/20…             3256 Pier 40 - Hudso…
+   5          729 8/8/2016… 8/8/201…              347 Greenwich St & …
+   # … with 99,995 more rows, and 10 more variables:  start station
+   #   latitude  <dbl>,  start station longitude  <dbl>,  end station
+   #   id  <dbl>,  end station name  <chr>,  end station
+   #   latitude  <dbl>,  end station longitude  <dbl>, bikeid <dbl>,
+   #   usertype <chr>,  birth year  <dbl>, gender <dbl>
+   ```
+
+
+
+
+
+2. Use `rename_all` and `str_replace_all` to replace the spaces in column
+   names with underscores `_`. This will make it easier to manipulate those
+   columns.
+
+   To check your answer:
+
+   The output of `print(trips, n = 5)` is
+
+   ```
+   # A tibble: 100,000 x 15
+     tripduration starttime stoptime start_station_id start_station_n…
+            <dbl> <chr>     <chr>               <dbl> <chr>
+   1         5945 8/5/2016… 8/5/201…              228 E 48 St & 3 Ave
+   2         1494 8/3/2016… 8/3/201…              460 S 4 St & Wythe …
+   3          826 8/30/201… 8/30/20…             3301 Columbus Ave & …
+   4          278 8/15/201… 8/15/20…             3256 Pier 40 - Hudso…
+   5          729 8/8/2016… 8/8/201…              347 Greenwich St & …
+   # … with 99,995 more rows, and 10 more variables:
+   #   start_station_latitude <dbl>, start_station_longitude <dbl>,
+   #   end_station_id <dbl>, end_station_name <chr>,
+   #   end_station_latitude <dbl>, end_station_longitude <dbl>,
+   #   bikeid <dbl>, usertype <chr>, birth_year <dbl>, gender <dbl>
+   ```
+
+
+
+
+
+3. Find the largest and smallest birth year of people that took trips
+   in August 2016. Assign the result to a tibble `years` with only two columns
+   `min_birth_year` and `max_birth_year` (in this order), and only one row.
+   To do that, you can use
+     - `summarize()`, `min()` and `max()` - make sure you use the
+       `na.rm` argument of `min()` and `max()` wisely.
+
+   To check your answer:
+
+   The output of `print(years, n = 0)` is
+
+   ```
+   # A tibble: 1 x 2
+   # … with 1 more row, and 2 variables: min_birth_year <dbl>,
+   #   max_birth_year <dbl>
+   ```
+
+
+
+
+
+4. Find all trips that started or ended on Broadway. Assign the result to
+   tibble `broadway`, which should be similar to `trips`, but only contain
+   the trips that started or ended on Broadway.
+   To do that, you can use
+     - `filter()` and `str_detect()`.
+
+   To check your answer:
+
+   The output of `print(broadway, n = 5)` is
+
+   ```
+   # A tibble: 18,603 x 15
+     tripduration starttime stoptime start_station_id start_station_n…
+            <dbl> <chr>     <chr>               <dbl> <chr>
+   1          826 8/30/201… 8/30/20…             3301 Columbus Ave & …
+   2         2440 8/28/201… 8/28/20…             3147 E 85 St & 3 Ave
+   3          660 8/16/201… 8/16/20…              362 Broadway & W 37…
+   4         1458 8/1/2016… 8/1/201…              321 Cadman Plaza E …
+   5          534 8/6/2016… 8/6/201…              536 1 Ave & E 30 St
+   # … with 18,598 more rows, and 10 more variables:
+   #   start_station_latitude <dbl>, start_station_longitude <dbl>,
+   #   end_station_id <dbl>, end_station_name <chr>,
+   #   end_station_latitude <dbl>, end_station_longitude <dbl>,
+   #   bikeid <dbl>, usertype <chr>, birth_year <dbl>, gender <dbl>
+   ```
+
+
+
+
+
+5. Create a `trips_counts` tibble that contains the counts of each
+   possible trip (one possible trip = one starting station and one ending
+   station). It should contain three columns: `start_station_name`,
+   `end_station_name` and `count`.
+   To do that, you can use
+     - `group_by()` to group by `start_station_name` and `end_station_name`,
+     - `summarize()` along with `n()` to compute the counts across groups.
+
+   To check your answer:
+
+   The output of `print(trips_counts, n = 5)` is
+
+   ```
+   # A tibble: 46,115 x 3
+   # Groups:   start_station_name [564]
+     start_station_name end_station_name count
+     <chr>              <chr>            <int>
+   1 1 Ave & E 16 St    1 Ave & E 16 St      3
+   2 1 Ave & E 16 St    1 Ave & E 18 St      4
+   3 1 Ave & E 16 St    1 Ave & E 30 St      9
+   4 1 Ave & E 16 St    1 Ave & E 44 St      1
+   5 1 Ave & E 16 St    1 Ave & E 68 St      2
+   # … with 46,110 more rows
+   ```
+
+
+
+
+
+6. Extract from `trips_counts` a tibble `frequent_trips` containing the 10
+   most frequent station-to-station trips.
+   To do that, you can use
+     - `arrange` and `desc` to re-order `trips_counts` in descending order
+        of `count`,
+     - `head()` to retain only the 10 first elements.
+
+   To check your answer:
+
+   The output of `print(frequent_trips, n = 5)` is
+
+   ```
+   # A tibble: 10 x 3
+   # Groups:   start_station_name [6]
+     start_station_name      end_station_name        count
+     <chr>                   <chr>                   <int>
+   1 Central Park S & 6 Ave  Central Park S & 6 Ave     73
+   2 Central Park S & 6 Ave  5 Ave & E 88 St            62
+   3 E 7 St & Avenue A       Cooper Square & E 7 St     48
+   4 Central Park S & 6 Ave  5 Ave & E 73 St            46
+   5 Centre St & Chambers St Centre St & Chambers St    46
+   # … with 5 more rows
+   ```
+
+
+
+
+

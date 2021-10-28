@@ -1,0 +1,174 @@
+HW7: dates1
+
+We'll look at a sample from
+[Citibike usage data](https://www.citibikenyc.com/system-data),
+corresponding to every bike trip taken by users in August 2016.
+
+In the whole exercise, do NOT use a `for`, `while`, or `repeat` loop!
+
+1. Load the `tidyverse` and `lubridate` packages.
+   Then, use `read_csv` to load `/course/data/citybike.csv` and assign it
+   to a tibble `trips`.
+
+   To check your answer:
+
+   The output of `print(trips, n = 5)` is
+
+   ```
+   # A tibble: 100,000 x 15
+     tripduration starttime stoptime  start station …  start station …
+            <dbl> <chr>     <chr>               <dbl> <chr>
+   1         5945 8/5/2016… 8/5/201…              228 E 48 St & 3 Ave
+   2         1494 8/3/2016… 8/3/201…              460 S 4 St & Wythe …
+   3          826 8/30/201… 8/30/20…             3301 Columbus Ave & …
+   4          278 8/15/201… 8/15/20…             3256 Pier 40 - Hudso…
+   5          729 8/8/2016… 8/8/201…              347 Greenwich St & …
+   # … with 1e+05 more rows, and 10 more variables:  start station
+   #   latitude  <dbl>,  start station longitude  <dbl>,  end station
+   #   id  <dbl>,  end station name  <chr>,  end station
+   #   latitude  <dbl>,  end station longitude  <dbl>, bikeid <dbl>,
+   #   usertype <chr>,  birth year  <dbl>, gender <dbl>
+   ```
+
+
+
+
+
+2. From `trips`, extract a tibble `trips_with_genders` that has the
+   `gender` column first and the other columns in the original order,
+   and with the `gender` column transformedas a factor with levels
+   `"Unknown"` for 0, `"Male"` for 1, and `"Female"` for 2.
+   Hint: you can use `mutate()` and `factor()`, and judiciously use the
+   `levels` argument of `factor()`. Then, you can reorder the columns using
+   `select()` and `everything()`.
+
+   To check your answer:
+
+   The output of `print(trips_with_genders, n = 5)` is
+
+   ```
+   # A tibble: 100,000 x 15
+     gender tripduration starttime stoptime  start station …
+     <fct>         <dbl> <chr>     <chr>               <dbl>
+   1 Male           5945 8/5/2016… 8/5/201…              228
+   2 Male           1494 8/3/2016… 8/3/201…              460
+   3 Male            826 8/30/201… 8/30/20…             3301
+   4 Female          278 8/15/201… 8/15/20…             3256
+   5 Female          729 8/8/2016… 8/8/201…              347
+   # … with 1e+05 more rows, and 10 more variables:  start station
+   #   name  <chr>,  start station latitude  <dbl>,  start station
+   #   longitude  <dbl>,  end station id  <dbl>,  end station
+   #   name  <chr>,  end station latitude  <dbl>,  end station
+   #   longitude  <dbl>, bikeid <dbl>, usertype <chr>,  birth
+   #   year  <dbl>
+   ```
+
+   The output of `print(trips_with_genders$gender[1:2])` is
+
+   ```
+   [1] Male Male
+   Levels: Unknown Male Female
+   ```
+
+
+
+
+
+3. From `trips`, extract a tibble `trips_with_dates` by
+     - modifying the `starttime` and `stoptime` columns to
+       contain dates in the format month-day-year_hour-minute-second,
+     - adding a column `interval` to representing the time interval
+       between `starttime` and `stoptime`,
+     - changing the order to have the `starttime`, `stoptime`, and `interval`
+       columns first, and then the others in the original order.
+   Hint: you can use `mutate()` and `mdy_hms()`, and then `select()` and
+   `everything()`.
+
+   To check your answer:
+
+   The output of `print(trips_with_dates, n = 5)` is
+
+   ```
+   # A tibble: 100,000 x 16
+     starttime           stoptime
+     <dttm>              <dttm>
+   1 2016-08-05 14:15:11 2016-08-05 15:54:16
+   2 2016-08-03 22:56:34 2016-08-03 23:21:28
+   3 2016-08-30 07:41:07 2016-08-30 07:54:54
+   4 2016-08-15 20:39:47 2016-08-15 20:44:26
+   5 2016-08-08 17:40:31 2016-08-08 17:52:40
+   # … with 1e+05 more rows, and 14 more variables: interval <Interval>,
+   #   tripduration <dbl>,  start station id  <dbl>,  start station
+   #   name  <chr>,  start station latitude  <dbl>,  start station
+   #   longitude  <dbl>,  end station id  <dbl>,  end station
+   #   name  <chr>,  end station latitude  <dbl>,  end station
+   #   longitude  <dbl>, bikeid <dbl>, usertype <chr>,  birth
+   #   year  <dbl>, gender <dbl>
+   ```
+
+   The output of `print(trips_with_dates$interval[1:3])` is
+
+   ```
+   [1] 2016-08-05 14:15:11 UTC--2016-08-05 15:54:16 UTC
+   [2] 2016-08-03 22:56:34 UTC--2016-08-03 23:21:28 UTC
+   [3] 2016-08-30 07:41:07 UTC--2016-08-30 07:54:54 UTC
+   ```
+
+
+
+
+
+4. From `trips_with_dates`, extract a tibble `trips_start_times` by
+     - selecting only the `starttime` column,
+     - adding two columns `start_ymd` and `start_hour` containing
+       the date and hour of day of the starting time for each trip
+       (you can use `mutate()` along with `floor_date()` and `hour()`)
+
+   To check your answer:
+
+   The output of `print(trips_start_times, n = 5)` is
+
+   ```
+   # A tibble: 100,000 x 3
+     starttime           start_ymd           start_hour
+     <dttm>              <dttm>                   <int>
+   1 2016-08-05 14:15:11 2016-08-05 00:00:00         14
+   2 2016-08-03 22:56:34 2016-08-03 00:00:00         22
+   3 2016-08-30 07:41:07 2016-08-30 00:00:00          7
+   4 2016-08-15 20:39:47 2016-08-15 00:00:00         20
+   5 2016-08-08 17:40:31 2016-08-08 00:00:00         17
+   # … with 1e+05 more rows
+   ```
+
+
+
+
+
+5. From `trips_start_times`, extract a tibble `trips_per_hour` by
+   computing, for each hour of the day,
+     - `num_trips`, the total number of trips,
+     - `num_days`, the number of days in which there was at least one trip,
+     - `mean_trips`, the ratio between the previous two.
+   Hint:  you can use `group_by()`, `summarize()`, as well as `n()` and
+   `n_distinct()`.
+
+   To check your answer:
+
+   The output of `print(trips_per_hour, n = 5)` is
+
+   ```
+   # A tibble: 24 x 4
+     start_hour num_trips num_days mean_trips
+          <int>     <int>    <int>      <dbl>
+   1          0       986       31      31.8
+   2          1       506       31      16.3
+   3          2       322       31      10.4
+   4          3       193       30       6.43
+   5          4       195       31       6.29
+   # … with 19 more rows
+   ```
+
+
+
+
+

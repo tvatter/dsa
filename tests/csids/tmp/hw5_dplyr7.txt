@@ -1,0 +1,145 @@
+HW5: dplyr7
+
+Do NOT use a `for`, `while`, or `repeat` loop!
+Whenever using `select()`, make sure to write `dplyr::select()` to avoid
+conflicts with other packages.
+
+1. Load the `tidyverse` package and load the `msleep` tibble.
+
+   To check your answer:
+
+   The output of `print(msleep, n = 5)` is
+
+   ```
+   # A tibble: 83 x 11
+     name  genus vore  order conservation sleep_total sleep_rem
+     <chr> <chr> <chr> <chr> <chr>              <dbl>     <dbl>
+   1 Chee… Acin… carni Carn… lc                  12.1      NA
+   2 Owl … Aotus omni  Prim… <NA>                17         1.8
+   3 Moun… Aplo… herbi Rode… nt                  14.4       2.4
+   4 Grea… Blar… omni  Sori… lc                  14.9       2.3
+   5 Cow   Bos   herbi Arti… domesticated         4         0.7
+   # … with 78 more rows, and 4 more variables: sleep_cycle <dbl>,
+   #   awake <dbl>, brainwt <dbl>, bodywt <dbl>
+   ```
+
+
+
+
+
+2. Calculate the proportion of each group of animals based on their diet
+   (the column `vore` tells you if an animal is carnivore, herbivore etc...)
+   into a new column called `vore_prop`.
+   To do that, you can use
+        - `count()` to count the number of animals within each `vore`,
+        - `mutate()` to calculate the proportion of each `vore` and
+          assign it to `prop`.
+
+   To check your answer:
+
+   The output of `print(vore_prop, n = 5)` is
+
+   ```
+   # A tibble: 5 x 3
+     vore    count   prop
+     <chr>   <int>  <dbl>
+   1 carni      19 0.229
+   2 herbi      32 0.386
+   3 insecti     5 0.0602
+   4 omni       20 0.241
+   5 <NA>        7 0.0843
+   ```
+
+
+
+
+
+3. We want to calculate the mean of each column among each animal group.
+   Specifically, we want a tibble containing the following information:
+   `vore`, `sleep_total`, `sleep_rem`, `sleep_cycle`, `awake`, `brainwt`,
+   `bodywt`, where each of these variables is the mean among the group.
+   To do that, you can use
+         - `group_by()` to group animals into groups based on `vore`,
+         - `summarize_if()` with `is.numeric()`
+           to calculate the mean of each property (hint: pay attention to
+           NAs).
+
+   To check your answer:
+
+   The output of `print(vore_means, n = 5)` is
+
+   ```
+   # A tibble: 5 x 7
+     vore    sleep_total sleep_rem sleep_cycle awake brainwt  bodywt
+     <chr>         <dbl>     <dbl>       <dbl> <dbl>   <dbl>   <dbl>
+   1 carni         10.4       2.29       0.373 13.6  0.0793   90.8
+   2 herbi          9.51      1.37       0.418 14.5  0.622   367.
+   3 insecti       14.9       3.52       0.161  9.06 0.0216   12.9
+   4 omni          10.9       1.96       0.592 13.1  0.146    12.7
+   5 <NA>          10.2       1.88       0.183 13.8  0.00763   0.858
+   ```
+
+
+
+
+
+4. Select the animals whose order is `Primates` and save the resulting
+   tibble into `primate`.
+   To do that, you can use
+        - `filter()` function to select the animals whose order are primates.
+
+   To check your answer:
+
+   The output of `print(primate, n = 5)` is
+
+   ```
+   # A tibble: 12 x 11
+     name  genus vore  order conservation sleep_total sleep_rem
+     <chr> <chr> <chr> <chr> <chr>              <dbl>     <dbl>
+   1 Owl … Aotus omni  Prim… <NA>                17         1.8
+   2 Griv… Cerc… omni  Prim… lc                  10         0.7
+   3 Pata… Eryt… omni  Prim… lc                  10.9       1.1
+   4 Gala… Gala… omni  Prim… <NA>                 9.8       1.1
+   5 Human Homo  omni  Prim… <NA>                 8         1.9
+   # … with 7 more rows, and 4 more variables: sleep_cycle <dbl>,
+   #   awake <dbl>, brainwt <dbl>, bodywt <dbl>
+   ```
+
+
+
+
+
+5. We want to calculate the brain to body weight proportion (called
+  `brain_pro`, i.e. the ratio between the brain weight and the body weight)
+   of each primate, and create a tibble `brain_primate` containing
+   `name`, `genus`, `brain_pro`, `brainwt`, `bodywt`, and all the
+   sleep properties `sleep_total`, `sleep_rem`, `sleep_cycle`.
+   Before computing the brain proportion of the total weight,
+   drop the rows with `NA` brain weight.
+   To do that, you can use
+     - `drop_na()` to drop the rows with `NA` brain weight,
+     - `mutate()` to add column `brain_pro`,
+     - `select()` to select the required columns
+       (hint: lookt at  `tidyselect::matches()`, `tidyselect::starts_with()`,
+       and `tidyselect::ends_with()`).
+
+   To check your answer:
+
+   The output of `print(brain_primate, n = 5)` is
+
+   ```
+   # A tibble: 9 x 8
+     name  genus brain_pro brainwt bodywt sleep_total sleep_rem
+     <chr> <chr>     <dbl>   <dbl>  <dbl>       <dbl>     <dbl>
+   1 Owl … Aotus    0.0323  0.0155   0.48        17         1.8
+   2 Pata… Eryt…    0.0115  0.115   10           10.9       1.1
+   3 Gala… Gala…    0.0250  0.005    0.2          9.8       1.1
+   4 Human Homo     0.0213  1.32    62            8         1.9
+   5 Maca… Maca…    0.0263  0.179    6.8         10.1       1.2
+   # … with 4 more rows, and 1 more variable: sleep_cycle <dbl>
+   ```
+
+
+
+
+

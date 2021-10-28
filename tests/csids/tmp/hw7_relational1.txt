@@ -1,0 +1,221 @@
+HW7: relational1
+
+This exercise was inspired by exercise 6 in Chapter 2 of
+[Bit By Bit: Social Research in the Digital Age]
+(https://www.bitbybitbook.com/en/1st-ed/observing-behavior/observing-activities/)
+by Matt Salganik.
+
+"In a widely discussed paper, Michel and colleagues
+([2011](https://doi.org/10.1126/science.1199644)) analyzed the content of
+more than five million digitized books in an attempt to identify long-term
+cultural trends. The data that they used has now been released as the Google
+NGrams dataset, and so we can use the data to replicate and extend some of
+their work.
+
+In one of the many results in the paper, Michel and colleagues argued that we
+are forgetting faster and faster. For a particular year, say “1883,” they
+calculated the proportion of all terms published in each year between 1875
+and 1975 that were “1883”. They reasoned that this proportion is a measure of
+the interest in events that happened in that year. In their figure 3a, they
+plotted the usage trajectories for three years: 1883, 1910, and 1950. These
+three years share a common pattern: little use before that year, then a
+spike, then decay."
+
+They noticed the rate of decay for each year mentioned seemed to increase
+with time and they argued that this means that we are forgetting the past
+faster and faster.
+
+The full paper can be found
+[here](https://aidenlab.org/papers/Science.Culturomics.pdf), and you are
+going to replicate part of figure 3a.
+
+To do so we will focus on the mention of terms that can represent years
+(strings like "1765", "1886", "1897", "1937"...). The raw data was fetched
+for you from the [Google Books NGram Viewer website]
+(http://storage.googleapis.com/books/ngrams/books/datasetsv2.html) and
+preprocessed into two files:
+  - `mentions_yearly_counts.tsv` contains the number of mentions of
+    different terms per year and the number of books retrieved where the term
+    appeared each year (one row per term per year).
+  - `yearly_total_counts.csv` contains the total number of mentions of
+    all terms per year as well as the number of pages and books retrived each
+    year (one row per year).
+
+In the whole exercise, do NOT use a `for`, `while`, or `repeat` loop!
+
+1. Load the `tidyverse` and `scales` packages and use
+   `theme_set(theme_light())` to set the theme for the rest of the exercise.
+   Then, use `read_tsv` to load `/course/data/mentions_yearly_counts.tsv` and assign
+   the resulting tibble to `terms_mentions`.
+   Set the parameters of `read_tsv()` in order to make sure of the following:
+     - Column names should be `"term"`, `"year"`, `"n_mentions"`,
+       and `"book_count"`.
+     - Column types should be `character`, `integer`, `integer`, `integer`.
+   Hint: you can use parameters `col_names` and `col_types` to achieve this.
+
+   To check your answer:
+
+   The output of `print(terms_mentions, n = 5)` is
+
+   ```
+   # A tibble: 53,393 x 4
+     term   year n_mentions book_count
+     <chr> <int>      <int>      <int>
+   1 1817   1524         31          1
+   2 1817   1575         17          1
+   3 1817   1607          3          1
+   4 1817   1637          2          1
+   5 1817   1662          1          1
+   # … with 5.339e+04 more rows
+   ```
+
+
+
+
+
+2. Similarly, load `/course/data/yearly_total_counts.csv` using `read_csv()` and
+   assign the resulting tibble to `total_mentions`.
+   Set the parameters of `read_csv()` in order to make sure of the following:
+     - Column names should be `"year"`, `"total_mentions"`,
+       `"total_page_count"`, `"total_book_count"`.
+     - Column types should be `integer`, `double`, `integer`, `integer`.
+   Hint: you can use parameters `col_names` and `col_types` to achieve this.
+   Note: the reason you should read in the `total_mentions` as a `double`
+   column is that it contains very large integers that don't fit within the
+   bounds of numbers represented by the `integer` type in R. Using a
+   double-precision number is our only recourse.
+
+   To check your answer:
+
+   The output of `print(total_mentions, n = 5)` is
+
+   ```
+   # A tibble: 425 x 4
+      year total_mentions total_page_count total_book_count
+     <int>          <dbl>            <int>            <int>
+   1  1505          32059              231                1
+   2  1507          49586              477                1
+   3  1515         289011             2197                1
+   4  1520          51783              223                1
+   5  1524         287177             1275                1
+   # … with 420 more rows
+   ```
+
+
+
+
+
+3. From `terms_mentions`, extract a new tibble `mentions` by left-joining
+   the `total_mentions` tibble.
+   `mentions` should print to:
+
+   To check your answer:
+
+   The output of `print(mentions, n = 5)` is
+
+   ```
+   # A tibble: 53,393 x 7
+     term   year n_mentions book_count total_mentions total_page_count
+     <chr> <int>      <int>      <int>          <dbl>            <int>
+   1 1817   1524         31          1         287177             1275
+   2 1817   1575         17          1         186706             1067
+   3 1817   1607          3          1         381763             1600
+   4 1817   1637          2          1         681719             2315
+   5 1817   1662          1          1         239762             1471
+   # … with 5.339e+04 more rows, and 1 more variable:
+   #   total_book_count <int>
+   ```
+
+
+
+
+
+4. Check that your join was successful by using `anti_join()` to drop all
+   observations in `terms_mentions` that have a match in `mentions` and
+   assign the resulting tibble to `diagnosis`. If the join went as expected
+   `diagnosis` should be an empty tibble with the same columns as
+   `terms_mentions`.
+
+
+
+
+
+5. From `mentions`, extract a new tibble `relative_mention_counts` by adding
+   a column `frac_total` containing the frequency of mentions of each term
+   per year. This frequency is obtained by dividing the number of
+   mentions of each term per year by the total number of mentions of all
+   terms that year,
+   Then, select only columns `term`, `year`, `n_mentions`,
+   `total_mentions` and `frac_total`.
+   Hint: you can use `mutate()` and `select()`.
+
+   To check your answer:
+
+   The output of `print(relative_mention_counts, n = 5)` is
+
+   ```
+   # A tibble: 53,393 x 5
+     term   year n_mentions total_mentions frac_total
+     <chr> <int>      <int>          <dbl>      <dbl>
+   1 1817   1524         31         287177 0.000108
+   2 1817   1575         17         186706 0.0000911
+   3 1817   1607          3         381763 0.00000786
+   4 1817   1637          2         681719 0.00000293
+   5 1817   1662          1         239762 0.00000417
+   # … with 5.339e+04 more rows
+   ```
+
+
+
+
+
+6. From `relative_mention_counts`, extract a new tibble
+   `examples_mention_counts` by
+     - keeping only the terms `"1883"`, `"1910"` and `"1950"`,
+     - transform the terms from characters to a factor in which the levels
+       are in reversed alphabetical order (`"1950"`, `"1910"` and `"1883"`)
+   Hint: you can use `filter()`, `mutate()` and `fct_rev()`.
+   Note: the order matters to reproduce the same colors as the original
+   figure without setting them explicitely when generating the plot.
+
+   To check your answer:
+
+   The output of `print(examples_mention_counts, n = 5)` is
+
+   ```
+   # A tibble: 825 x 5
+     term   year n_mentions total_mentions frac_total
+     <fct> <int>      <int>          <dbl>      <dbl>
+   1 1883   1515          1         289011 0.00000346
+   2 1883   1520          1          51783 0.0000193
+   3 1883   1524         15         287177 0.0000522
+   4 1883   1574          4          62235 0.0000643
+   5 1883   1575          3         186706 0.0000161
+   # … with 820 more rows
+   ```
+
+
+
+
+
+7. Generate a plot to reproduce the large window of figure 3a and assign the
+   result to `paper_figure`.
+   To do this, use `examples_mention_counts` and:
+     - `ggplot` to initialize the plot,
+     - `geom_line()` to get the lineplot,
+     - `scale_y_continuous(label = percent)` to set the y-axis labels to
+       the percent format,
+     - `coord_cartesian()` and its argument `xlim` to limit the coordinates
+       to show only the mentions across the timeframe `1850`-`2012`,
+     - `labs()` to set the
+       - title as `"Are we neglecting the past faster?"`,
+       - x-axis as `"Year"`
+       - y-axis as `"Frequency of mention of each term"`,
+       - color as `"Term"`.
+   Store the plot into a `ggplot` object `paper_figure`.
+
+
+
+
+
+

@@ -1,0 +1,328 @@
+HW7: email
+
+In this exercise, you will perform an analysis of email data between
+184 people in a company from 1998 to 2001.
+
+In the whole exercise, do NOT use a `for`, `while`, or `repeat` loop!
+
+1. Load the `tidyverse` and `lubridates` packages and use
+   `theme_set(theme_light())` to set the theme for the rest of the exercise.
+   Then, use `read_csv` to load
+     - `/course/data/people.csv` and assign it to a tibble `people`, which contains
+       information about the 184 people who sent the emails,
+     - `/course/data/email.csv` and assign it to a tibble `email`, which contains
+       information about each email sent (e.g., time, sender and receiver).
+
+   To check your answer:
+
+   The output of `print(email, n = 5)` is
+
+   ```
+   # A tibble: 38,131 x 8
+      onset terminus  tail  head onset.censored terminus.censor… duration
+      <dbl>    <dbl> <dbl> <dbl> <lgl>          <lgl>               <dbl>
+   1 9.58e8   9.58e8    30    30 FALSE          FALSE                   0
+   2 9.59e8   9.59e8    30    30 FALSE          FALSE                   0
+   3 9.59e8   9.59e8    30    30 FALSE          FALSE                   0
+   4 9.64e8   9.64e8    30    30 FALSE          FALSE                   0
+   5 9.70e8   9.70e8    30    30 FALSE          FALSE                   0
+   # … with 3.813e+04 more rows, and 1 more variable: edge.id <dbl>
+   ```
+
+   The output of `print(people, n = 10)` is
+
+   ```
+   # A tibble: 184 x 5
+      vertex.names email_id      person_name    role        dept
+             <dbl> <chr>         <chr>          <chr>       <chr>
+    1            1 albert.meyers Albert Meyers  Employee    Specialist
+    2            2 a..martin     Thomas Martin  Vice Presi… <NA>
+    3            3 andrea.ring   Andrea Ring    <NA>        <NA>
+    4            4 andrew.lewis  Andrew Lewis   Director    <NA>
+    5            5 andy.zipper   Andy Zipper    Vice Presi… Enron Online
+    6            6 a..shankman   Jeffrey Shank… President   Enron Global…
+    7            7 barry.tychol… Barry Tycholiz Vice Presi… <NA>
+    8            8 benjamin.rog… Benjamin Roge… Employee    Associate
+    9            9 bill.rapp     Bill Rapp      <NA>        <NA>
+   10           10 bill.williams <NA>           <NA>        <NA>
+   # … with 174 more rows
+   ```
+
+
+
+
+
+2. From `email`, extract a tibble `email_w_time` which adds as FIRST column
+   a new column called `date` corresponding to the time when the email is
+   sent. Note that, in `email`, the `onset` variable represents a number of
+   seconds since January 1st, 1970 UTC.
+   Hint: you can use `mutate()`, `as_datetime()`, `select()` and
+   `everything()`.
+
+   To check your answer:
+
+   The output of `print(email_w_time, n = 5)` is
+
+   ```
+   # A tibble: 38,131 x 9
+     date                 onset terminus  tail  head onset.censored
+     <dttm>               <dbl>    <dbl> <dbl> <dbl> <lgl>
+   1 2000-05-15 12:35:00 9.58e8   9.58e8    30    30 FALSE
+   2 2000-05-18 08:15:00 9.59e8   9.59e8    30    30 FALSE
+   3 2000-05-24 06:58:00 9.59e8   9.59e8    30    30 FALSE
+   4 2000-07-19 11:09:00 9.64e8   9.64e8    30    30 FALSE
+   5 2000-09-28 06:45:00 9.70e8   9.70e8    30    30 FALSE
+   # … with 3.813e+04 more rows, and 3 more variables:
+   #   terminus.censored <lgl>, duration <dbl>, edge.id <dbl>
+   ```
+
+
+
+
+
+3. Now let's take a look into the `people` dataset.
+   We can see some missing values in `person_name` column, but we can get a
+   person's name using his/her `email_id`.
+   For example, Albert Meyers's email ID is just `"albert.meyers"`.
+   To fill in missing values with email ID, let's first create a function
+   `email_id_to_name` that:
+     - take a character vector `email_id` as input,
+     - returns the name extracted from the email id.
+   To do that, you can use:
+     - `str_replace_all()` to replace the dots by spaces,
+     - `str_squish()` to remove the extra spaces,
+     - `str_to_title()` to capitalize the first and last names.
+
+   To check your answer:
+
+   The output of `print(email_id_to_name('john.doe'))` is
+
+   ```
+   [1] "John Doe"
+   ```
+
+   The output of `print(email_id_to_name('john...doe'))` is
+
+   ```
+   [1] "John Doe"
+   ```
+
+   The output of `print(email_id_to_name(c('john.doe', 'jane.doe')))` is
+
+   ```
+   [1] "John Doe" "Jane Doe"
+   ```
+
+
+
+
+
+4. From `people`, extract a tibble `people_new` that adds the missing names
+   using the function you just created.
+   To do that, you can use `mutate()`, `ifelse()`, and `is.na()`. If the name
+   is missing, extract it from `email_id` using `email_id_to_name`. If the
+   name is not missing, do not modify it.
+
+   To check your answer:
+
+   The output of `print(people_new, n = 10)` is
+
+   ```
+   # A tibble: 184 x 5
+      vertex.names email_id      person_name    role        dept
+             <dbl> <chr>         <chr>          <chr>       <chr>
+    1            1 albert.meyers Albert Meyers  Employee    Specialist
+    2            2 a..martin     Thomas Martin  Vice Presi… <NA>
+    3            3 andrea.ring   Andrea Ring    <NA>        <NA>
+    4            4 andrew.lewis  Andrew Lewis   Director    <NA>
+    5            5 andy.zipper   Andy Zipper    Vice Presi… Enron Online
+    6            6 a..shankman   Jeffrey Shank… President   Enron Global…
+    7            7 barry.tychol… Barry Tycholiz Vice Presi… <NA>
+    8            8 benjamin.rog… Benjamin Roge… Employee    Associate
+    9            9 bill.rapp     Bill Rapp      <NA>        <NA>
+   10           10 bill.williams Bill Williams  <NA>        <NA>
+   # … with 174 more rows
+   ```
+
+
+
+
+
+5. From `people_new`, extract a tibble `people_new2` that fills the `NA`
+   values in `role` and `dept`, as well as transform `role` into a factor...
+   Let's fill in the missing values:
+     - in `role` with `"Employee"`,
+     - and in `dept` with `General`.
+   Furthermore, let's transform `role` into a factor using levels sorted
+   according the the following hierarchy:
+
+   ```
+   role_order <- c("Employee", "Trader", "Manager", "Managing Director",
+      "Director", "In House Lawyer", "Vice President", "President", "CEO")
+   ```
+
+   To do that, you can use:
+     - `replace_na()` to fill in the missing values,
+     - `mutate()` to transform `role` into a factor with `factor()` with
+       levels properly specified.
+
+   # A tibble: 184 x 5
+   vertex.names email_id        person_name      role           dept
+   <dbl>        <chr>           <chr>            <fct>          <chr>
+   1             albert.meyers   Albert Meyers    Employee       Specialist
+   2             a..martin       Thomas Martin    Vice President General
+   3             andrea.ring     Andrea Ring      Employee       General
+   4             andrew.lewis    Andrew Lewis     Director       General
+   5             andy.zipper     Andy Zipper      Vice President Enron Online
+   6             a..shankman     Jeffrey Shankman President      Enron Global Mkts
+   7             barry.tycholiz  Barry Tycholiz   Vice President General
+   8             benjamin.rogers Benjamin Rogers  Employee       Associate
+   9             bill.rapp       Bill Rapp        Employee       General
+   10            bill.williams   Bill Williams    Employee       General
+   … with 174 more rows
+
+
+
+
+
+6. Let's combine the two datasets `email_w_time` and `people_new2` together
+   into a new tibble `email_w_names`.
+   Here, we want to keep the information about every email and add the name,
+   email ID, role and department for the sender as well as for the receiver:
+     - in `people_new2`, the `vertex.names` column is a primary key
+       identifying each person,
+     - in `email_w_time`, the `tail` and `head` columns are foreign keys
+       corresponding to `vertex.name` and representing
+       respectively the receiver and sender of the email.
+   In other words, you need to use two `left_join()` to
+   add first the information of the receiver and then again to add
+   that of the sender. You will also need to update the names of the columns
+   added by the joins.
+   Finally, only keep the emails where the sender is different from the
+   receiver, and keep only the information about the date, sender
+   and receiver (4 columns each, with email ID, name, role and department).
+   To do that, you can use:
+     - `left_join()` and `rename()` twice to add the information about
+       the receiver and sender (change `email_id` to `receiver_email`,
+       `person_name` to `receiver`, `role` to `receiver_role`,
+       `dept` to `receiver_dept`, and similarly with `sender_xyz`),
+      - `select()` and `starts_with()` to only keep the `date`, as well
+        as the sender and receiver information.
+
+   To check your answer:
+
+   The output of `print(email_w_names, n = 5)` is
+
+   ```
+   # A tibble: 34,427 x 9
+     date                sender_email sender_name sender_role sender_dept
+     <dttm>              <chr>        <chr>       <fct>       <chr>
+   1 2001-03-15 07:43:00 jeffrey.sha… Jeffrey Sh… President   Enron Glob…
+   2 2001-04-02 17:44:00 jeffrey.sha… Jeffrey Sh… President   Enron Glob…
+   3 2001-06-06 02:40:00 jeffrey.sha… Jeffrey Sh… President   Enron Glob…
+   4 2001-06-11 09:20:00 jeffrey.sha… Jeffrey Sh… President   Enron Glob…
+   5 2001-03-08 07:52:00 kim.ward     Kim Ward    Employee    General
+   # … with 3.442e+04 more rows, and 4 more variables:
+   #   receiver_email <chr>, receiver <chr>, receiver_role <fct>,
+   #   receiver_dept <chr>
+   ```
+
+
+
+
+
+7. From `email_w_names`, extract a tibble `sender_role_count` that
+   contains the number of emails sent by each role, sorted in descending
+   order.
+   Hint: to do that, you can use `group_by()`, `summarize()` and `arrange()`.
+
+   To check your answer:
+
+   The output of `print(sender_role_count, n = 5)` is
+
+   ```
+   # A tibble: 9 x 2
+     sender_role    count
+     <fct>          <int>
+   1 Employee       16394
+   2 Vice President  8300
+   3 President       1879
+   4 CEO             1703
+   5 Director        1655
+   # … with 4 more rows
+   ```
+
+
+
+
+
+8. During which period of the day are people tend to send emails?
+   To answer this, use `email_w_names` to produce an histogram of the
+   number of emails sent per our of the day.
+   To do that, use:
+     - `mutate()` and `hour()` to add an `hour` column,
+     - `ggplot()` to initialize the plot,
+     - `geom_histogram()` to plot a histogram for `hour`, with `bins = 24`,
+     - `labs()` to set the
+       - title as `"People send more emails in the middle of the day"`,
+       - x-axis as `"Hour"`
+       - y-axis as `"Count (n)"`.
+   Store the plot into a `ggplot` object `g1`.
+
+
+
+
+
+9. What is the trend regarding emails usage? Do people use it more
+   frequently in 1998 or 2001?
+   From `email_w_names`, extract a tibble `count_by_month` that contains
+   the number of emails sent per `sender_role` for each month from
+   January 1st, 1998 until December 31st, 2001.
+   To do that, you can use:
+     - `filter()` to only keep the emails sent before 2002,
+     - `mutate()` and `floor_date()` to floor the date at the monthly
+       frequency,
+     - `group_by()` to group the data by date and sender's role,
+     - `summarize()` to count the number of emails sent per month and
+       sender's role
+     - `arrange()` to order the rows by date.
+
+   To check your answer:
+
+   The output of `print(count_by_month, n = 5)` is
+
+   ```
+   # A tibble: 265 x 3
+   # Groups:   date [38]
+     date                sender_role       count
+     <dttm>              <fct>             <int>
+   1 1998-11-01 00:00:00 Employee              7
+   2 1998-11-01 00:00:00 Managing Director     2
+   3 1998-12-01 00:00:00 Employee             15
+   4 1998-12-01 00:00:00 Managing Director     3
+   5 1998-12-01 00:00:00 Vice President        2
+   # … with 260 more rows
+   ```
+
+
+
+
+
+10. Let's now visualize it: plot the `count` against `date` with colors
+   spliting by `sender_role`.
+   To do that, use:
+     - `ggplot()` to initialize the plot,
+     - `geom_point()` to get the scatterplot,
+     - `geom_smooth()` with `method = "loess"` to add a smoothing trend,
+     - `labs()` to set the
+       - title as `"Emailed activity increased from 1999 to 2001"`,
+       - x-axis as `"Date"`
+       - y-axis as `"Count (n)"`,
+       - color as `"Sender role"`.
+   Save your plot to `g2`.
+
+
+
+
+
+

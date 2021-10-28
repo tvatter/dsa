@@ -1,0 +1,252 @@
+HW5: tidyr
+
+Do NOT use a `for`, `while`, or `repeat` loop!
+Whenever using `select()`, make sure to write `dplyr::select()` to avoid
+conflicts with other packages.
+
+1. Load the `tidyverse` package and use `read_csv` to load
+   `/course/data/useR2016.csv` and assign it to a tibble `useR2016`.
+
+   To check your answer:
+
+   The output of `print(useR2016, n = 5)` is
+
+   ```
+   # A tibble: 455 x 48
+     Q2    Q3     Q7     Q8     Q11   Q12   Q13   Q13_B Q13_C Q13_D Q13_E
+     <chr> <chr>  <chr>  <chr>  <chr> <chr> <chr> <chr> <chr> <chr> <chr>
+   1 Men   > 35   Docto… Acade… > 10… Yes   I us… I wr… I wr… <NA>  <NA>
+   2 Men   > 35   Maste… Non-a… 2-5 … Yes   <NA>  <NA>  <NA>  <NA>  <NA>
+   3 Women 35 or… Maste… Non-a… < 2 … No    I us… <NA>  <NA>  <NA>  <NA>
+   4 Men   35 or… Docto… Acade… <NA>  <NA>  <NA>  <NA>  <NA>  <NA>  <NA>
+   5 Men   35 or… Maste… Non-a… 2-5 … Yes   I us… I wr… I wr… <NA>  <NA>
+   # … with 450 more rows, and 37 more variables: Q13_F <chr>,
+   #   Q14 <chr>, Q15 <chr>, Q15_B <chr>, Q15_C <chr>, Q15_D <chr>,
+   #   Q16 <chr>, Q17 <chr>, Q17_B <chr>, Q18 <chr>, Q19 <chr>,
+   #   Q19_B <chr>, Q19_C <chr>, Q19_D <chr>, Q19_E <chr>, Q19_F <chr>,
+   #   Q19_G <lgl>, Q19_H <chr>, Q20 <chr>, Q20_B <chr>, Q21 <chr>,
+   #   Q22 <chr>, Q22_B <chr>, Q23 <chr>, Q24 <chr>, Q24_B <chr>,
+   #   Q24_C <chr>, Q24_D <chr>, Q24_E <chr>, Q24_F <chr>, Q24_G <chr>,
+   #   Q24_H <chr>, Q24_I <lgl>, Q24_J <chr>, Q24_K <chr>, Q24_L <chr>,
+   #   Q25 <dbl>
+   ```
+
+
+
+
+
+2. Use `select` to select columns `Q2` to `Q13_F` except `Q12`, as well as
+   column `Q25`, and save the result into a tibble `t1`.
+
+   To check your answer:
+
+   The output of `print(t1, n = 5)` is
+
+   ```
+   # A tibble: 455 x 12
+     Q2    Q3     Q7     Q8     Q11   Q13   Q13_B Q13_C Q13_D Q13_E Q13_F
+     <chr> <chr>  <chr>  <chr>  <chr> <chr> <chr> <chr> <chr> <chr> <chr>
+   1 Men   > 35   Docto… Acade… > 10… I us… I wr… I wr… <NA>  <NA>  <NA>
+   2 Men   > 35   Maste… Non-a… 2-5 … <NA>  <NA>  <NA>  <NA>  <NA>  <NA>
+   3 Women 35 or… Maste… Non-a… < 2 … I us… <NA>  <NA>  <NA>  <NA>  <NA>
+   4 Men   35 or… Docto… Acade… <NA>  <NA>  <NA>  <NA>  <NA>  <NA>  <NA>
+   5 Men   35 or… Maste… Non-a… 2-5 … I us… I wr… I wr… <NA>  <NA>  <NA>
+   # … with 450 more rows, and 1 more variable: Q25 <dbl>
+   ```
+
+
+
+
+
+2. From `t1`, build a tibble `t1_longer` of dimension 1767 x 8,
+   which contains columns `Q2`, `Q3`, `Q7`, `Q8`, `Q11`, `Q25`, `cases`
+   and `comments`, where
+     -  `cases` correspond to the column names `Q13`, `Q13_B`, `Q13_C`,
+        `Q13_D`, `Q13_E`,  `Q13_F`,
+     - `comments` are the values contained in these columns,
+   without the `NA` values.
+   To do that, you can use
+     - `pivot_longer` on columns `Q13` to `Q13_F`, with
+       - `names_to` as `"cases"`,
+       - `values_to` as `"comments"`,
+       - and dropping all NAs (hint: look at the `values_drop_na` argument).
+
+   To check your answer:
+
+   The output of `print(t1_longer, n = 5)` is
+
+   ```
+   # A tibble: 1,767 x 8
+     Q2    Q3      Q7        Q8     Q11     Q25 cases comments
+     <chr> <chr>   <chr>     <chr>  <chr> <dbl> <chr> <chr>
+   1 Men   > 35    Doctorat… Acade… > 10…   442 Q13   I use functions fr…
+   2 Men   > 35    Doctorat… Acade… > 10…   442 Q13_B I write R code des…
+   3 Men   > 35    Doctorat… Acade… > 10…   442 Q13_C I write R function…
+   4 Women 35 or … Masters … Non-a… < 2 …   118 Q13   I use functions fr…
+   5 Men   35 or … Masters … Non-a… 2-5 …   650 Q13   I use functions fr…
+   # … with 1,762 more rows
+   ```
+
+
+
+
+
+3. From `t1_longer`, build a tibble `t1_longer_rename` of dimension 1767 x 8
+   by using `rename()` on the following columns:
+     - `Q2` as `sex`,
+     - `Q3` as `age`,
+     - `Q7` as `degree`,
+     - `Q8` as `academic_status`,
+     - `Q11` as `experience`,
+     - `Q25` as `value`.
+
+   To check your answer:
+
+   The output of `print(t1_longer_rename, n = 5)` is
+
+   ```
+   # A tibble: 1,767 x 8
+     sex   age    degree academic_status experience value cases comments
+     <chr> <chr>  <chr>  <chr>           <chr>      <dbl> <chr> <chr>
+   1 Men   > 35   Docto… Academic        > 10 years   442 Q13   I use fu…
+   2 Men   > 35   Docto… Academic        > 10 years   442 Q13_B I write …
+   3 Men   > 35   Docto… Academic        > 10 years   442 Q13_C I write …
+   4 Women 35 or… Maste… Non-academic    < 2 years    118 Q13   I use fu…
+   5 Men   35 or… Maste… Non-academic    2-5 years    650 Q13   I use fu…
+   # … with 1,762 more rows
+   ```
+
+
+
+
+
+4. From `t1_longer_rename`, extract a tibble `separate_drop_redundant`  which
+   doesn't contain the column `cases` anymore but instead contain the
+   column `category`:
+    - equal to `A` if `cases` is `Q13`,
+    - `B` if `cases` is `Q13_B`,
+    - `C` if `cases` is `Q13_C`.
+   To do that you can separate `cases` into 2 columns called `case_name`
+   and `category`, fill in NAs with `A` in `category`, and then delete
+   `case_name`.
+   More specifically, you can use
+     - `separate` to separate column `cases` into `case_name` and `category`
+       (hint: set `fill` as `right` and look at the `sep` argument).
+     - `replace_na` with `list(category = 'A')` to replace all NAs in
+       `category` to `A`,
+     - `select` to drop column `case_name`.
+
+   To check your answer:
+
+   The output of `print(separate_drop_redundant, n = 5)` is
+
+   ```
+   # A tibble: 1,767 x 8
+     sex   age   degree academic_status experience value category
+     <chr> <chr> <chr>  <chr>           <chr>      <dbl> <chr>
+   1 Men   > 35  Docto… Academic        > 10 years   442 A
+   2 Men   > 35  Docto… Academic        > 10 years   442 B
+   3 Men   > 35  Docto… Academic        > 10 years   442 C
+   4 Women 35 o… Maste… Non-academic    < 2 years    118 A
+   5 Men   35 o… Maste… Non-academic    2-5 years    650 A
+   # … with 1,762 more rows, and 1 more variable: comments <chr>
+   ```
+
+
+
+
+
+5. From `separate_drop_redundant`, extract a tibble `filter_na_unite` which
+   does not contain any NAs in `age` and `experience` (i.e., NAs are
+   filtered out). Then unite `age` and `experience` into  a column
+   `age_and_experience` separated by ` && `.
+   To do that, you can use:
+     - `filter` to filter out NAs in `age` and `experience` from
+       `separate_drop_redundant`,
+     - `unite` to unite `age` and `experience` into `age_and_experience`,
+       (hint: look at the `sep` argument).
+
+   To check your answer:
+
+   The output of `print(filter_na_unite, n = 5)` is
+
+   ```
+   # A tibble: 1,662 x 7
+     sex   age_and_experie… degree academic_status value category
+     <chr> <chr>            <chr>  <chr>           <dbl> <chr>
+   1 Men   > 35 && > 10 ye… Docto… Academic          442 A
+   2 Men   > 35 && > 10 ye… Docto… Academic          442 B
+   3 Men   > 35 && > 10 ye… Docto… Academic          442 C
+   4 Women 35 or under && … Maste… Non-academic      118 A
+   5 Men   35 or under && … Maste… Non-academic      650 A
+   # … with 1,657 more rows, and 1 more variable: comments <chr>
+   ```
+
+
+
+
+
+6. From `filter_na_unite`, extract a tibble `first_100_rank` which
+   contain the 100 datapoints with highest `value`, as well as
+   a column `row_number` that gives the rank of each datapoint
+   (with 1 being the lowest `value` and 100 the highest)
+   To do that, you can use
+     - `mutate` and `row_number` to rank `value`
+        (naming the new column as `row_number`).
+     - `filter` to filter out `row_number` less than or equal to 100.
+
+   To check your answer:
+
+   The output of `print(first_100_rank, n = 5)` is
+
+   ```
+   # A tibble: 100 x 8
+     sex   age_and_experie… degree academic_status value category
+     <chr> <chr>            <chr>  <chr>           <dbl> <chr>
+   1 Men   > 35 && 5-10 ye… Docto… Non-academic       52 C
+   2 Men   > 35 && > 10 ye… Docto… Academic           18 A
+   3 Men   > 35 && > 10 ye… Docto… Academic           18 B
+   4 Men   > 35 && > 10 ye… Docto… Academic           18 C
+   5 Men   > 35 && > 10 ye… Docto… Academic           18 D
+   # … with 95 more rows, and 2 more variables: comments <chr>,
+   #   row_number <int>
+   ```
+
+
+
+
+
+7. From `t1_longer_rename`, extract a tibble `experience_percentage` which
+   contains a `sex` column and 4 additional columns representing the
+   percentage of people per experience level, and 2 rows for
+   `Men` and `Women`.
+   The dataset should be grouped by `sex` with counted numbers
+   of each experience level. Then the counts can be normalized into
+   percentages.
+   Some tidying will make a nice table to show the final numbers.
+   To do that, you can use
+     - `drop_na` to drop NAs on `t1_longer_rename`,
+     - `group_by` using the `sex` variable,
+     - `count` to count the cases per experience level and use
+       the name argument as `count`,
+     - `mutate` to normalize the `count` column into a percentage
+       using `count / sum(count) * 100`,
+     - `pivot_wider` to convert from a long table into a wide table.
+
+   To check your answer:
+
+   The output of `print(experience_percentage, n = 5)` is
+
+   ```
+   # A tibble: 2 x 5
+   # Groups:   sex [2]
+     sex    < 2 years   > 10 years   2-5 years   5-10 years
+     <chr>       <dbl>        <dbl>       <dbl>        <dbl>
+   1 Men          6.90         36.0        25.0         32.1
+   2 Women       17.3          23.0        25.5         34.2
+   ```
+
+
+
+
+

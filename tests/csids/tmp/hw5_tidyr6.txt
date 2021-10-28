@@ -1,0 +1,182 @@
+HW5: tidyr6
+
+Do NOT use a `for`, `while`, or `repeat` loop!
+Whenever using `select()`, make sure to write `dplyr::select()` to avoid
+conflicts with other packages.
+
+1. Load the `tidyverse` package and use `read_csv` to load
+   `/course/data/football.csv` and assign it to a tibble `fu`.
+
+   To check your answer:
+
+   The output of `print(fu, n = 5)` is
+
+   ```
+   # A tibble: 40,945 x 9
+     date       home_team away_team home_score away_score tournament
+     <date>     <chr>     <chr>          <dbl>      <dbl> <chr>
+   1 1872-11-30 Scotland  England            0          0 Friendly
+   2 1873-03-08 England   Scotland           4          2 Friendly
+   3 1874-03-07 Scotland  England            2          1 Friendly
+   4 1875-03-06 England   Scotland           2          2 Friendly
+   5 1876-03-04 Scotland  England            3          0 Friendly
+   # … with 40,940 more rows, and 3 more variables: city <chr>,
+   #   country <chr>, neutral <lgl>
+   ```
+
+
+
+
+
+2. Sometimes, we want to know the year of a game happening instead of
+   the exact dates. So let's split the dates into three columns:
+   `year`, `mon`, and `day`, and save the result tibble to `fu_separated`.
+   To do that, you can use:
+      - `separate` to separate the first column `date`
+        (hint : use `sep = "[-]+"` in `separate`, you'll learn about
+         regular expressions later on.)
+
+   To check your answer:
+
+   The output of `print(fu_separated, n = 5)` is
+
+   ```
+   # A tibble: 40,945 x 11
+     year  mon   day   home_team away_team home_score away_score
+     <chr> <chr> <chr> <chr>     <chr>          <dbl>      <dbl>
+   1 1872  11    30    Scotland  England            0          0
+   2 1873  03    08    England   Scotland           4          2
+   3 1874  03    07    Scotland  England            2          1
+   4 1875  03    06    England   Scotland           2          2
+   5 1876  03    04    Scotland  England            3          0
+   # … with 40,940 more rows, and 4 more variables: tournament <chr>,
+   #   city <chr>, country <chr>, neutral <lgl>
+   ```
+
+
+
+
+
+3. Notice that the data is recorded per game instead of per team. Suppose
+   that we want to have to study the game data per team with the following
+   information: `year`, `mon`, `day`, `home_score`, `away_score`,
+   `tournament`, `city`, `country`, `neutral`, `team_type`, `team`.
+   To do that, we need to list all the games each team played: thus, each
+   game will be recorded twice, once for the home team and once for
+   the away team.
+   Extract such a tibble from `fu_separated` and assign it to `fu_tidy`.
+   To do that, you can use
+        - `pivot_longer` to transform the `home_team` and `away_team`
+          columns to new columns `team` and `team_type` recording whether
+          this team is `home_team` or `away_team` in this game.
+
+   To check your answer:
+
+   The output of `print(fu_tidy, n = 5)` is
+
+   ```
+   # A tibble: 81,890 x 11
+     year  mon   day   home_score away_score tournament city  country
+     <chr> <chr> <chr>      <dbl>      <dbl> <chr>      <chr> <chr>
+   1 1872  11    30             0          0 Friendly   Glas… Scotla…
+   2 1872  11    30             0          0 Friendly   Glas… Scotla…
+   3 1873  03    08             4          2 Friendly   Lond… England
+   4 1873  03    08             4          2 Friendly   Lond… England
+   5 1874  03    07             2          1 Friendly   Glas… Scotla…
+   # … with 81,885 more rows, and 3 more variables: neutral <lgl>,
+   #   team_type <chr>, team <chr>
+   ```
+
+
+
+
+
+4. Now, notice that the two columns `home_score` and `away_score` are
+   impractical: they do not indicate whether they correpond to goals scored
+   or conceded. Additionally, an important statistic is the goal difference,
+   namely the difference between goals scored and conceded.
+   From `fu_tidy`, let's extract a tibble `fu_team` that contains
+   `year`, `mon`, `day`, `scored`, `conceded`, `gd`, `team`,
+   `city`, `country`.
+   To do that, you can use:
+        - `mutate` and `ifelse` to record the `score` of that team
+        - `select` to extract all columns except `team_type`, `home_score`,
+          `away_score`.
+
+   To check your answer:
+
+   The output of `print(fu_team, n = 5)` is
+
+   ```
+   # A tibble: 81,890 x 9
+     year  mon   day   scored conceded    gd team     city    country
+     <chr> <chr> <chr>  <dbl>    <dbl> <dbl> <chr>    <chr>   <chr>
+   1 1872  11    30         0        0     0 Scotland Glasgow Scotland
+   2 1872  11    30         0        0     0 England  Glasgow Scotland
+   3 1873  03    08         4        2     2 England  London  England
+   4 1873  03    08         2        4    -2 Scotland London  England
+   5 1874  03    07         2        1     1 Scotland Glasgow Scotland
+   # … with 81,885 more rows
+   ```
+
+
+
+
+
+5. The `city` and `country` column represents where the game was held.
+   From `fu_team`, extract a tibble `fu_city` that concatenate the city
+   and country information into one column called `place`.
+   To do that, you can use `unite` to combine `city` and `country`.
+
+   To check your answer:
+
+   The output of `print(fu_city, n = 5)` is
+
+   ```
+   # A tibble: 81,890 x 8
+     year  mon   day   scored conceded    gd team     place
+     <chr> <chr> <chr>  <dbl>    <dbl> <dbl> <chr>    <chr>
+   1 1872  11    30         0        0     0 Scotland Glasgow_Scotland
+   2 1872  11    30         0        0     0 England  Glasgow_Scotland
+   3 1873  03    08         4        2     2 England  London_England
+   4 1873  03    08         2        4    -2 Scotland London_England
+   5 1874  03    07         2        1     1 Scotland Glasgow_Scotland
+   # … with 81,885 more rows
+   ```
+
+
+
+
+
+6. From `fu_city`, let's extract `fu_england`, a tibble containing
+   the yearly average goals scored, goals conceded, and goal differences
+   for the English team evolved over the years, sorted by descending
+   goal differences, descending goals scored, and ascending goals conceded.
+   To do that, you can use:
+     - `filter()` to select the England team,
+     - `group_by()` to group by year,
+     - `summarize_if()` with `is.numeric()` to calculate the averages
+       of the correct colums (hint: there might be NAs, don't forget to
+       pass `na.rm = TRUE` to `mean()`),
+     - `arrange()` to sort the observations as described above.
+
+   To check your answer:
+
+   The output of `print(fu_england, n = 5)` is
+
+   ```
+   # A tibble: 139 x 4
+     year  scored conceded    gd
+     <chr>  <dbl>    <dbl> <dbl>
+   1 1899    6.33    1      5.33
+   2 1908    5.57    0.714  4.86
+   3 1893    5.67    1      4.67
+   4 1888    5       0.667  4.33
+   5 1891    5       1      4
+   # … with 134 more rows
+   ```
+
+
+
+
+

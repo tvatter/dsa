@@ -1,0 +1,132 @@
+HW5: tidyr3
+
+Do NOT use a `for`, `while`, or `repeat` loop!
+Whenever using `select()`, make sure to write `dplyr::select()` to avoid
+conflicts with other packages.
+
+1. Load the `tidyverse` package and use `read_csv` to load
+   `/course/data/warpbreaks.csv` and assign it to a tibble `warpbreaks`.
+
+   To check your answer:
+
+   The output of `print(warpbreaks, n = 5)` is
+
+   ```
+   # A tibble: 70 x 3
+     breaks wool  tension
+      <dbl> <chr> <chr>
+   1     26 A     L
+   2     30 A     L
+   3     NA A     L
+   4     25 A     L
+   5     70 A     L
+   # … with 65 more rows
+   ```
+
+
+
+
+
+2. Now let's clean the data, we can see a lot of missing values or values
+   which don't make any sense in each of the three columns.
+   Filter out all the `NA` values, as well as the observations such that
+     - `wool` is neither `A` mor `B`,
+     - `tension` is neither `L`, nor `M`, nor `H`,
+   and the rows which has negative or extreme (>100) `breaks` values.
+   Then change the columns order into `wool`, `tension`, `breaks`.
+   To complete this, you can use:
+     - `drop_na` to filter out all the `NA` values,
+     - `filter` to remove the relevant rows,
+     - `select` to change the columns order into `wool`, `tension`, `breaks`.
+   Save your answer into a tibble `t1` which has 49 rows and 3 columns.
+
+   To check your answer:
+
+   The output of `print(t1, n = 5)` is
+
+   ```
+   # A tibble: 49 x 3
+     wool  tension breaks
+     <chr> <chr>    <dbl>
+   1 A     L           26
+   2 A     L           30
+   3 A     L           25
+   4 A     L           70
+   5 A     L           52
+   # … with 44 more rows
+   ```
+
+
+
+
+
+3. Use `count` to count the number of rows for each combination of
+   (`wool`,`tension`) and save the into `t2` which should include 6 rows
+   and 3 columns: `wool`, `tension` and `n`.
+
+   To check your answer:
+
+   The output of `print(t2, n = 5)` is
+
+   ```
+   # A tibble: 6 x 3
+     wool  tension     n
+     <chr> <chr>   <int>
+   1 A     H           8
+   2 A     L           8
+   3 A     M           8
+   4 B     H           9
+   5 B     L           8
+   # … with 1 more row
+   ```
+
+
+
+
+
+4. Use `pivot_wider` on `t1` to
+     - spread the column `tension` into three columns `L`, `M` and `H`,
+     - fill in the values with the sum of `breaks` for each combination of
+       (`wool`,`tension`).
+   Hint: use the argument `values_fn = list(breaks = sum)`.
+
+   To check your answer:
+
+   The output of `print(t3, n = 1)` is
+
+   ```
+   # A tibble: 2 x 4
+     wool      L     M     H
+     <chr> <dbl> <dbl> <dbl>
+   1 A       347   195   197
+   # … with 1 more row
+   ```
+
+
+
+
+
+5. Use `pivot_longer` on `t3` to create  a tibble `t4` of 6 rows
+   with columns `wool`, `tension` and `sum_of_breaks` by gathering the
+   columns `L`, `M` and `H`.
+
+   To check your answer:
+
+   The output of `print(t4, n = 5)` is
+
+   ```
+   # A tibble: 6 x 3
+     wool  tension sum_of_breaks
+     <chr> <chr>           <dbl>
+   1 A     L                 347
+   2 A     M                 195
+   3 A     H                 197
+   4 B     L                 223
+   5 B     M                 220
+   # … with 1 more row
+   ```
+
+
+
+
+
