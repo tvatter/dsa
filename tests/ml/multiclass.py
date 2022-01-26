@@ -1,4 +1,5 @@
 # # META CODE
+
 # from sklearn.multiclass import OneVsRestClassifier
 # from xgboost import XGBClassifier
 # from sklearn.preprocessing import MultiLabelBinarizer
@@ -13,7 +14,6 @@
 # clf.fit(X, y)
 
 # logistic regression for multi-class classification using built-in one-vs-rest
-from operator import mul
 
 from sklearn.datasets import make_classification
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
